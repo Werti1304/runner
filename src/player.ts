@@ -2,6 +2,8 @@ import { Assets, Sprite } from "pixi.js";
 
 export class Player {
     public sprite: Sprite = new Sprite();
+    velocity_y: number = 0;
+    is_grounded: boolean = false;
 
     constructor() { }
 
