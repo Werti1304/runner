@@ -5,6 +5,7 @@ import { Game } from "./game";
 import { start_input_listeners } from "./input";
 import { start_window_handlers } from "./windows_events";
 import { Graphics } from "pixi.js";
+import { FpsDisplay } from "./ui/fps_display";
 
 (async () => {
   const game = Game.ins;
@@ -19,8 +20,18 @@ import { Graphics } from "pixi.js";
   platform.rect(0, platformY, game.app.screen.width, 4).fill(0x00ff00);
   game.app.stage.addChild(platform);
 
-  const scheduler = new Scheduler(60, 5)
-  scheduler.start(process, process_physics);
+  const fpsDisplay = new FpsDisplay();
+  const scheduler = new Scheduler(60, 5);
+  scheduler.start(
+    (delta) => {
+        fpsDisplay.updateRender(delta);
+        process(delta);
+    },
+    (dt) => {
+        fpsDisplay.updatePhysics();
+        process_physics(dt);
+    }
+  );
 
   start_window_handlers();
   start_input_listeners();

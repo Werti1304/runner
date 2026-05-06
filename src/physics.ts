@@ -11,7 +11,6 @@ const GROUND_Y = window.innerHeight * 0.7; // TODO: Remove, just for prototyping
 let jump_hold_timer = 0;
 
 export function process_physics(delta: number) {
-    
     let game = Game.ins;
     let player = game.player;
 
