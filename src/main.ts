@@ -6,11 +6,12 @@ import { start_input_listeners } from "./input";
 import { start_window_handlers } from "./windows_events";
 import { Graphics } from "pixi.js";
 import { FpsDisplay } from "./ui/fps_display";
+import { SegmentManager } from "./platforms/segment_manager";
 
 (async () => {
   const game = Game.ins;
   await game.init();
-  game.player.sprite.anchor.set(0.5)
+  game.player.sprite.anchor.set(0.5);
   game.player.sprite.position.set(game.app.screen.width / 2, game.app.screen.height / 2);
   game.app.stage.addChild(game.player.sprite);
 
@@ -21,16 +22,19 @@ import { FpsDisplay } from "./ui/fps_display";
   game.app.stage.addChild(platform);
 
   const fpsDisplay = new FpsDisplay();
+  const segment_manager = new SegmentManager();
   const scheduler = new Scheduler(60, 5);
   scheduler.start(
     (delta) => {
-        fpsDisplay.updateRender(delta);
-        process(delta);
+      fpsDisplay.updateRender();
+      process(delta);
     },
     (dt) => {
-        fpsDisplay.updatePhysics();
-        process_physics(dt);
-    }
+      fpsDisplay.updatePhysics();
+      fpsDisplay.tick();
+      segment_manager.tick(dt);
+      process_physics(dt);
+    },
   );
 
   start_window_handlers();

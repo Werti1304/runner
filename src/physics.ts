@@ -11,40 +11,40 @@ const GROUND_Y = window.innerHeight * 0.7; // TODO: Remove, just for prototyping
 let jump_hold_timer = 0;
 
 export function process_physics(delta: number) {
-    let game = Game.ins;
-    let player = game.player;
+  let game = Game.ins;
+  let player = game.player;
 
-    game.player.sprite.rotation += 1 * delta;
+  game.player.sprite.rotation += 1 * delta;
 
-    if (game.pressed_keys["KeyA"]) {
-        player.sprite.x -= MOVE_SPEED * delta;
-    }
+  if (game.pressed_keys["KeyA"]) {
+    player.sprite.x -= MOVE_SPEED * delta;
+  }
 
-    if (game.pressed_keys["KeyD"]) {
-        player.sprite.x += MOVE_SPEED * delta;
-    }
+  if (game.pressed_keys["KeyD"]) {
+    player.sprite.x += MOVE_SPEED * delta;
+  }
 
-    if (game.pressed_keys["Space"] && player.is_grounded) {
-        player.velocity_y = JUMP_FORCE;
-        jump_hold_timer = JUMP_HOLD_MAX_TIME;
-        player.is_grounded = false;
-    }
+  if (game.pressed_keys["Space"] && player.is_grounded) {
+    player.velocity_y = JUMP_FORCE;
+    jump_hold_timer = JUMP_HOLD_MAX_TIME;
+    player.is_grounded = false;
+  }
 
-    if (game.pressed_keys["Space"] && !player.is_grounded && jump_hold_timer > 0) {
-        player.velocity_y += JUMP_HOLD_FORCE * delta;
-        jump_hold_timer -= delta;
-    }
+  if (game.pressed_keys["Space"] && !player.is_grounded && jump_hold_timer > 0) {
+    player.velocity_y += JUMP_HOLD_FORCE * delta;
+    jump_hold_timer -= delta;
+  }
 
-    player.velocity_y += GRAVITY * delta;
+  player.velocity_y += GRAVITY * delta;
 
-    // actual movement
-    player.sprite.y += player.velocity_y * delta;
+  // actual movement
+  player.sprite.y += player.velocity_y * delta;
 
-    const feetPos = player.sprite.y + player.sprite.height / 2;    
-    if (feetPos >= GROUND_Y) {
-        console.log("Test")
-        player.sprite.y = GROUND_Y - player.sprite.height / 2;
-        player.velocity_y = 0;
-        player.is_grounded = true;
-    }
+  const feetPos = player.sprite.y + player.sprite.height / 2;
+  if (feetPos >= GROUND_Y) {
+    console.log("Test");
+    player.sprite.y = GROUND_Y - player.sprite.height / 2;
+    player.velocity_y = 0;
+    player.is_grounded = true;
+  }
 }
