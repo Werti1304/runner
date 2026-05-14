@@ -3,7 +3,7 @@ import { vertex } from "./vertex_shader";
 import { fragment } from "./fragment_shader";
 import { compose, IDENTITY, Mat4, perspective, rotateZ, scaleMat, SHARED_GEOMETRY, translate } from "./matrix_math";
 import { Game } from "../game";
-import { Side, SIDE_CONFIG } from "./segment_side";
+import { Side, SIDE_CONFIG, SIDES } from "./segment_side";
 
 const VIEW = translate(0, 0, -8);
 var PROJECTION = perspective(Math.PI / 3, window.innerWidth / window.innerHeight, 0.1, 200);
@@ -13,8 +13,8 @@ export function recalculateProjectionMatrix() {
 }
 
 // At what Z indices we say that the player has collision
-const COLLISION_Z_START = -3.5;
-const COLLISION_Z_END = -1;
+const COLLISION_Z_START = -2;
+const COLLISION_Z_END = 0;
 
 export class Segment {
   private mesh: Mesh<Geometry, Shader>;
@@ -24,14 +24,17 @@ export class Segment {
   private y: number;
   private rotation: number;
   private lane: number;
+  private side: Side;
 
   public valid: boolean;
   
   static ViewMatrix: Mat4 = IDENTITY; 
+  static CurrentSide: Side = SIDES[1];
 
   constructor(z: number, side: Side, lane: number) {
     this.z = z;
     this.lane = lane;
+    this.side = side;
 
     const cfg = SIDE_CONFIG[side];
 
@@ -75,6 +78,10 @@ export class Segment {
             value: new Float32Array(cfg.color),
             type: "vec3<f32>",
           },
+          // uColor: {
+          //   value: new Float32Array([Math.random(), Math.random(), Math.random()]),
+          //   type: "vec3<f32>",
+          // },
         },
       },
     });
@@ -101,21 +108,44 @@ export class Segment {
       return;
     }
 
-    if(this.z > COLLISION_Z_START && this.z > COLLISION_Z_END)
+    if(Segment.CurrentSide == this.side && this.z >= COLLISION_Z_START && this.z - 0.5 <= COLLISION_Z_END)
     {
-      switch(this.lane)
+
+      // If left or top the lanes are swapped
+      // (This is totally not confusing or anything)
+      if(this.side == SIDES[0] || this.side == SIDES[2])
       {
-        case -2: 
-          Game.ins.segment_collisions[0] = true;
-          break;
-        case 0: 
-          Game.ins.segment_collisions[1] = true;
-          break;
-        case 2: 
-          Game.ins.segment_collisions[2] = true;
-          break;
-        default:
-          console.error("Invalid lane on segment");
+        switch(this.lane)
+        {
+          case 2: 
+            Game.ins.segment_collisions[0] = true;
+            break;
+          case 0: 
+            Game.ins.segment_collisions[1] = true;
+            break;
+          case -2: 
+            Game.ins.segment_collisions[2] = true;
+            break;
+          default:
+            console.error("Invalid lane on segment");
+        }
+      }
+      else
+      {
+        switch(this.lane)
+        {
+          case -2: 
+            Game.ins.segment_collisions[0] = true;
+            break;
+          case 0: 
+            Game.ins.segment_collisions[1] = true;
+            break;
+          case 2: 
+            Game.ins.segment_collisions[2] = true;
+            break;
+          default:
+            console.error("Invalid lane on segment");
+        }
       }
     }
 
@@ -125,7 +155,7 @@ export class Segment {
       rotateZ(this.rotation),
 
       // thinner wall strips
-      scaleMat(1.0, 0, 3),
+      scaleMat(1.0, 0, 1.0),
     );
 
     const u = this.mesh?.shader?.resources.uniforms.uniforms;

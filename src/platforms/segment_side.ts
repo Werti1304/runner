@@ -3,6 +3,14 @@ export type Side = "top" | "bottom" | "left" | "right";
 
 export const SIDES: Side[] = ["top", "bottom", "left", "right"];
 
+// I want to hereby apologize to whoever may lay his eyes on this
+const SIDE_ORDERED: Side[] = ["top", "right", "bottom", "left"];
+export function rotateSide(side: Side, clockwise: boolean): Side {
+  const i = SIDE_ORDERED.indexOf(side);
+  const offset = clockwise ? 1 : -1;
+  return SIDE_ORDERED[(i + offset + 4) % 4];
+}
+
 export type SideConfig = {
   x: number;
   y: number;

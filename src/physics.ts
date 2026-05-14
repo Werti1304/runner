@@ -1,20 +1,27 @@
 import { Game } from "./game";
+import { Segment } from "./platforms/segment";
+import { rotateSide } from "./platforms/segment_side";
+import { Player } from "./player";
 
 const GRAVITY = 0.8;
-const JUMP_FORCE = -0.5;
-const JUMP_HOLD_FORCE = -0.6;
+const JUMP_FORCE = -0.4;
+const JUMP_HOLD_FORCE = -0.4;
 const JUMP_HOLD_MAX_TIME = 0.3;
 const MOVE_SPEED = 0.3;
+const MAX_JUMPS = 2;
+let jumps_remaining = 0;
 
-let screen_width  = window.innerWidth;
-let screen_height = window.innerHeight;
-let ground_y:     number;
-let wall_x_left:  number;
-let wall_x_right: number;
-let offset_x:     number;
+export let screen_width  = window.innerWidth;
+export let screen_height = window.innerHeight;
+export let ground_y:     number;
+export let wall_x_left:  number;
+export let wall_x_right: number;
+export let offset_x:     number;
 
 // If space is held slightly longer, the jump is higher
 let jump_hold_timer = 0;
+// Once the player let space go while in the air, a double jump can be done
+let space_let_go_in_air: boolean = false;
 
 export function updateCollisionBounds() {
   screen_width  = window.innerWidth;
@@ -33,6 +40,8 @@ export function process_physics(delta: number) {
   let game = Game.ins;
   let player = game.player;
 
+  game.drawCollisionVisualization();
+
   game.player.sprite.rotation += 1 * delta;
 
   if (game.pressed_keys["KeyA"]) {
@@ -43,10 +52,31 @@ export function process_physics(delta: number) {
     player.sprite.x += MOVE_SPEED * screen_height * delta;
   }
 
-  if (game.pressed_keys["Space"] && player.is_grounded) {
-    player.velocity_y = JUMP_FORCE * screen_height;
+  if(player.is_grounded)
+  {
+    jumps_remaining = MAX_JUMPS;
+
+    if(game.pressed_keys["Space"])
+    {
+      player.velocity_y = JUMP_FORCE * screen_height;
+      jump_hold_timer = JUMP_HOLD_MAX_TIME;
+      player.is_grounded = false;
+      jumps_remaining--;
+    }
+    space_let_go_in_air = false;
+  }
+  
+  if(!player.is_grounded && game.pressed_keys["Space"] && space_let_go_in_air && jumps_remaining > 0)
+  {
+    player.velocity_y += JUMP_FORCE * screen_height;
     jump_hold_timer = JUMP_HOLD_MAX_TIME;
-    player.is_grounded = false;
+    jumps_remaining--;
+    space_let_go_in_air = false;
+  }
+  
+  if(!player.is_grounded && !game.pressed_keys["Space"])
+  {
+    space_let_go_in_air = true; 
   }
 
   if (game.pressed_keys["Space"] && !player.is_grounded && jump_hold_timer > 0) {
@@ -60,8 +90,7 @@ export function process_physics(delta: number) {
   player.sprite.y += player.velocity_y * delta;
 
   // Check ground collision
-  const feetPos = player.sprite.y + player.sprite.height / 2;
-  if (feetPos >= ground_y) {
+  if (isPlayerOnGround(player, game.segment_collisions)) {
     player.sprite.y = ground_y - player.sprite.height / 2;
     player.velocity_y = 0;
     player.is_grounded = true;
@@ -84,10 +113,12 @@ function wall_collide_handler(left: boolean) {
     // Left wall becomes ground: player slides right-to-left
     player.sprite.x = normalizedY * screen_height + offset_x;
     Game.ins.segment_camera.target_roll -= Math.PI / 2;
+    Segment.CurrentSide = rotateSide(Segment.CurrentSide, true);
   } else {
     // Right wall becomes ground: player slides left-to-right (mirrored)
     player.sprite.x = (1 - normalizedY) * screen_height + offset_x;
     Game.ins.segment_camera.target_roll += Math.PI / 2;
+    Segment.CurrentSide = rotateSide(Segment.CurrentSide, false);
   }
 
   // Clamp inside walls so we don't immediately re-trigger
@@ -96,4 +127,31 @@ function wall_collide_handler(left: boolean) {
   player.sprite.y = 1.01 * ground_y;
   player.velocity_y = 0;
   player.is_grounded = true;
+}
+
+function isPlayerOnGround(player: Player, segment_collisions: boolean[]): boolean {
+  const feetPos = player.sprite.y + player.sprite.height / 2;
+
+  // If in air, no collision possible
+  // If under platform for more than half its body, also no collision possible
+  if (feetPos < ground_y || feetPos > ground_y + player.sprite.y / 2)
+    return false;
+
+  const segment_width = (wall_x_right - wall_x_left) / 3;
+  const player_left   = player.sprite.x - player.sprite.width / 2;
+  const player_right  = player.sprite.x + player.sprite.width / 2;
+
+  // Check all 3 segments, if player overlaps any active one, has_ground = true
+  for (let s = 0; s <= 2; s++) {
+    const seg_start = wall_x_left + s * segment_width;
+    const seg_end   = seg_start + segment_width;
+
+    const overlaps = player_right > seg_start && player_left < seg_end;
+
+    if (overlaps && segment_collisions[s]) {
+      return true;
+    }
+  }
+
+  return false;
 }
