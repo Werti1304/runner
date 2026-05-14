@@ -1,5 +1,7 @@
+import { Game } from "./game";
+
 export function process(delta: number) {
-  // Just for fun, let's rotate mr rabbit a little.
-  // * Delta is 1 if running at 100% performance *
-  // * Creates frame-independent transformation *
+  // Game.ins.segment_camera.pitch += delta;
+  // Game.ins.segment_camera.roll += delta;
+  // Game.ins.segment_camera.yaw += delta;
 }

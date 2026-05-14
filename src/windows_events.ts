@@ -1,5 +1,5 @@
 import { Game } from "./game";
-import { updateGroundY } from "./physics";
+import { updateCollisionBounds } from "./physics";
 import { recalculateProjectionMatrix } from "./platforms/segment";
 
 export function startWindowHandlers() {
@@ -13,5 +13,5 @@ export function onWindowResize() {
   recalculateProjectionMatrix();
   game.drawCollisionVisualization();
   game.player.drawPlayerSprite();
-  updateGroundY();
+  updateCollisionBounds();
 }

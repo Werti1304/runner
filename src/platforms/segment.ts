@@ -1,7 +1,7 @@
 import { Mesh, Geometry, Shader } from "pixi.js";
 import { vertex } from "./vertex_shader";
 import { fragment } from "./fragment_shader";
-import { compose, IDENTITY, perspective, rotateZ, scaleMat, SHARED_GEOMETRY, translate } from "./matrix_math";
+import { compose, IDENTITY, Mat4, perspective, rotateZ, scaleMat, SHARED_GEOMETRY, translate } from "./matrix_math";
 import { Game } from "../game";
 import { Side, SIDE_CONFIG } from "./segment_side";
 
@@ -26,6 +26,8 @@ export class Segment {
   private lane: number;
 
   public valid: boolean;
+  
+  static ViewMatrix: Mat4 = IDENTITY; 
 
   constructor(z: number, side: Side, lane: number) {
     this.z = z;
@@ -60,7 +62,7 @@ export class Segment {
           },
 
           uView: {
-            value: IDENTITY,
+            value: Segment.ViewMatrix,
             type: "mat4x4<f32>",
           },
 
@@ -92,7 +94,7 @@ export class Segment {
 
     this.z += delta * 3;
 
-    if (this.z > 3) {
+    if (this.z > 10) {
       // make them repeat:
       // this.z -= SEGMENT_COUNT * SEGMENT_DEPTH;
       this.remove();
@@ -128,7 +130,7 @@ export class Segment {
 
     const u = this.mesh?.shader?.resources.uniforms.uniforms;
     u.uModel = model;
-    u.uView = VIEW;
+    u.uView = Segment.ViewMatrix;
     u.uProjection = PROJECTION;
   }
 

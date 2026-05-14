@@ -2,8 +2,8 @@ import { Game } from "../game";
 import { Segment } from "./segment";
 import { SIDES } from "./segment_side";
 
-const SEGMENT_SPEED_MULTIPLIER = .5;
-const LEVEL_DIFFICULTY = 0.0 // 0 - 1
+const SEGMENT_SPEED_MULTIPLIER = 1.5;
+const LEVEL_DIFFICULTY = 0.3 // 0 - 1
 
 export class SegmentManager {
   private segments: Segment[] = [];
@@ -30,8 +30,14 @@ export class SegmentManager {
     }
   }
 
+  // Every tick, update view matrix once (for performance)
+  private updateViewMatrix() {
+    Segment.ViewMatrix = Game.ins.segment_camera.buildViewMatrix();
+  }
+
   public tick(delta: number) {
     Game.ins.segment_collisions = [ false, false, false ];
+    this.updateViewMatrix();
 
     for (let i = this.segments.length - 1; i >= 0; i--) {
       const seg = this.segments[i];

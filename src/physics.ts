@@ -6,6 +6,8 @@ const JUMP_HOLD_FORCE = -500;
 const JUMP_HOLD_MAX_TIME = 0.3;
 const MOVE_SPEED = 200;
 var ground_y: number;
+var wall_x_left: number;
+var wall_x_right: number;
 
 // If space is held slightly longer, the jump is higher
 let jump_hold_timer = 0;
@@ -40,6 +42,7 @@ export function process_physics(delta: number) {
   // actual movement
   player.sprite.y += player.velocity_y * delta;
 
+
   const feetPos = player.sprite.y + player.sprite.height / 2;
   if (feetPos >= ground_y) {
     console.log("Test");
@@ -47,8 +50,12 @@ export function process_physics(delta: number) {
     player.velocity_y = 0;
     player.is_grounded = true;
   }
+
+
 }
 
-export function updateGroundY() {
+export function updateCollisionBounds() {
   ground_y = window.innerHeight * 0.8;
+  wall_x_left = window.innerWidth * 0.8;
+  wall_x_right = window.innerWidth * 0.2;
 }

@@ -3,84 +3,77 @@
 import { Buffer, BufferUsage, Geometry } from "pixi.js";
 
 // Matrix calc stuff, inspired by https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/WebGL_model_view_projection
-export type Mat4 = number[];
+export type Mat4 = Float32Array;
 
-export const IDENTITY = new Float32Array([
+export const IDENTITY: Mat4 = new Float32Array([
     1, 0, 0, 0,
     0, 1, 0, 0,
     0, 0, 1, 0,
     0, 0, 0, 1,
 ]);
 
-export function perspective(
-    fov: number,
-    aspect: number,
-    near: number,
-    far: number,
-): Mat4 {
+export function perspective(fov: number, aspect: number, near: number, far: number): Mat4 {
     const f = 1 / Math.tan(fov / 2);
     const nf = 1 / (near - far);
 
-    return [
+    return new Float32Array([
         f / aspect, 0, 0, 0,
         0, f, 0, 0,
         0, 0, (far + near) * nf, -1,
         0, 0, (2 * far * near) * nf, 0,
-    ];
+    ]);
 }
 
 export function translate(x: number, y: number, z: number): Mat4 {
-    return [
+    return new Float32Array([
         1, 0, 0, 0,
         0, 1, 0, 0,
         0, 0, 1, 0,
         x, y, z, 1,
-    ];
+    ]);
 }
 
-export function rotateX(a: number): number[] {
-  const c = Math.cos(a), s = Math.sin(a);
-  return [
-    1,  0,  0, 0,
-    0,  c, -s, 0,
-    0,  s,  c, 0,
-    0,  0,  0, 1,
-  ];
+export function rotateX(a: number): Mat4 {
+    const c = Math.cos(a), s = Math.sin(a);
+    return new Float32Array([
+        1,  0,  0, 0,
+        0,  c, -s, 0,
+        0,  s,  c, 0,
+        0,  0,  0, 1,
+    ]);
 }
 
-export function rotateY(a: number): number[] {
-  const c = Math.cos(a), s = Math.sin(a);
-  return [
-     c, 0, s, 0,
-     0, 1, 0, 0,
-    -s, 0, c, 0,
-     0, 0, 0, 1,
-  ];
+export function rotateY(a: number): Mat4 {
+    const c = Math.cos(a), s = Math.sin(a);
+    return new Float32Array([
+         c, 0, s, 0,
+         0, 1, 0, 0,
+        -s, 0, c, 0,
+         0, 0, 0, 1,
+    ]);
 }
 
 export function rotateZ(a: number): Mat4 {
-    const c = Math.cos(a);
-    const s = Math.sin(a);
-
-    return [
+    const c = Math.cos(a), s = Math.sin(a);
+    return new Float32Array([
          c, s, 0, 0,
         -s, c, 0, 0,
          0, 0, 1, 0,
          0, 0, 0, 1,
-    ];
+    ]);
 }
 
 export function scaleMat(x: number, y: number, z: number): Mat4 {
-    return [
+    return new Float32Array([
         x, 0, 0, 0,
         0, y, 0, 0,
         0, 0, z, 0,
         0, 0, 0, 1,
-    ];
+    ]);
 }
 
 export function multiplyMatrices(a: Mat4, b: Mat4): Mat4 {
-    const out = new Array(16).fill(0);
+    const out = new Float32Array(16);
     for (let col = 0; col < 4; col++) {
         for (let row = 0; row < 4; row++) {
             let sum = 0;
