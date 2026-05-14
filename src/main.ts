@@ -3,23 +3,21 @@ import { process } from "./process";
 import { process_physics } from "./physics";
 import { Game } from "./game";
 import { start_input_listeners } from "./input";
-import { start_window_handlers } from "./windows_events";
-import { Graphics } from "pixi.js";
+import { startWindowHandlers } from "./windows_events";
 import { FpsDisplay } from "./ui/fps_display";
 import { SegmentManager } from "./platforms/segment_manager";
 
 (async () => {
   const game = Game.ins;
   await game.init();
+
+  // Player
   game.player.sprite.anchor.set(0.5);
-  game.player.sprite.position.set(game.app.screen.width / 2, game.app.screen.height / 2);
+  game.player.sprite.zIndex = 1;
   game.app.stage.addChild(game.player.sprite);
 
   // Prototype platform
-  const platformY = game.app.screen.height * 0.7;
-  const platform = new Graphics();
-  platform.rect(0, platformY, game.app.screen.width, 4).fill(0x00ff00);
-  game.app.stage.addChild(platform);
+  game.app.stage.addChild(game.collision_visualization);
 
   const fpsDisplay = new FpsDisplay();
   const segment_manager = new SegmentManager();
@@ -37,6 +35,6 @@ import { SegmentManager } from "./platforms/segment_manager";
     },
   );
 
-  start_window_handlers();
+  startWindowHandlers();
   start_input_listeners();
 })();

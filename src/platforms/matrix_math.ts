@@ -38,6 +38,26 @@ export function translate(x: number, y: number, z: number): Mat4 {
     ];
 }
 
+export function rotateX(a: number): number[] {
+  const c = Math.cos(a), s = Math.sin(a);
+  return [
+    1,  0,  0, 0,
+    0,  c, -s, 0,
+    0,  s,  c, 0,
+    0,  0,  0, 1,
+  ];
+}
+
+export function rotateY(a: number): number[] {
+  const c = Math.cos(a), s = Math.sin(a);
+  return [
+     c, 0, s, 0,
+     0, 1, 0, 0,
+    -s, 0, c, 0,
+     0, 0, 0, 1,
+  ];
+}
+
 export function rotateZ(a: number): Mat4 {
     const c = Math.cos(a);
     const s = Math.sin(a);

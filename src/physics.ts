@@ -1,11 +1,11 @@
 import { Game } from "./game";
 
-const GRAVITY = 500.0;
-const JUMP_FORCE = -350;
+const GRAVITY = 1000.0;
+const JUMP_FORCE = -400;
 const JUMP_HOLD_FORCE = -500;
 const JUMP_HOLD_MAX_TIME = 0.3;
 const MOVE_SPEED = 200;
-const GROUND_Y = window.innerHeight * 0.7; // TODO: Remove, just for prototyping
+var ground_y: number;
 
 // If space is held slightly longer, the jump is higher
 let jump_hold_timer = 0;
@@ -41,10 +41,14 @@ export function process_physics(delta: number) {
   player.sprite.y += player.velocity_y * delta;
 
   const feetPos = player.sprite.y + player.sprite.height / 2;
-  if (feetPos >= GROUND_Y) {
+  if (feetPos >= ground_y) {
     console.log("Test");
-    player.sprite.y = GROUND_Y - player.sprite.height / 2;
+    player.sprite.y = ground_y - player.sprite.height / 2;
     player.velocity_y = 0;
     player.is_grounded = true;
   }
+}
+
+export function updateGroundY() {
+  ground_y = window.innerHeight * 0.8;
 }

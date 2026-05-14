@@ -12,18 +12,24 @@ export function recalculateProjectionMatrix() {
   PROJECTION = perspective(Math.PI / 3, window.innerWidth / window.innerHeight, 0.1, 200);
 }
 
+// At what Z indices we say that the player has collision
+const COLLISION_Z_START = -3.5;
+const COLLISION_Z_END = -1;
+
 export class Segment {
-  mesh: Mesh<Geometry, Shader>;
+  private mesh: Mesh<Geometry, Shader>;
 
-  z: number;
-  x: number;
-  y: number;
-  rotation: number;
+  private z: number;
+  private x: number;
+  private y: number;
+  private rotation: number;
+  private lane: number;
 
-  valid: boolean;
+  public valid: boolean;
 
   constructor(z: number, side: Side, lane: number) {
     this.z = z;
+    this.lane = lane;
 
     const cfg = SIDE_CONFIG[side];
 
@@ -86,11 +92,29 @@ export class Segment {
 
     this.z += delta * 3;
 
-    if (this.z > 10) {
+    if (this.z > 3) {
       // make them repeat:
       // this.z -= SEGMENT_COUNT * SEGMENT_DEPTH;
       this.remove();
       return;
+    }
+
+    if(this.z > COLLISION_Z_START && this.z > COLLISION_Z_END)
+    {
+      switch(this.lane)
+      {
+        case -2: 
+          Game.ins.segment_collisions[0] = true;
+          break;
+        case 0: 
+          Game.ins.segment_collisions[1] = true;
+          break;
+        case 2: 
+          Game.ins.segment_collisions[2] = true;
+          break;
+        default:
+          console.error("Invalid lane on segment");
+      }
     }
 
     const model = compose(
