@@ -1,7 +1,6 @@
 import { BufferImageSource, Graphics, RenderTexture, Sprite, Texture } from "pixi.js";
 import { Game } from "../game.js";
 
-// I DONT KNOW WHY IT HAS TO BE THIS EXACT VALUE OR EVERYTHING BREAKS .-.
 export const W = 500;
 export const H = 500;
 
@@ -349,20 +348,12 @@ export class Voronoi {
       }
     }
 
-    // // Impact-point crosshair + circle
+    // // impact point marker
     // const markerR = 10;
     // ctx.strokeStyle = "#d85a30";
     // ctx.lineWidth = 2;
     // ctx.beginPath();
     // ctx.arc(ix, iy, markerR, 0, Math.PI * 2);
-    // ctx.stroke();
-
-    // ctx.lineWidth = 1.5;
-    // ctx.beginPath();
-    // ctx.moveTo(ix - markerR * 1.6, iy);
-    // ctx.lineTo(ix + markerR * 1.6, iy);
-    // ctx.moveTo(ix, iy - markerR * 1.6);
-    // ctx.lineTo(ix, iy + markerR * 1.6);
     // ctx.stroke();
 
     return g;

@@ -21,7 +21,7 @@ import { SegmentManager } from "./platforms/segment_manager.js";
 
   // Prototype platform
   game.collision_visualization.zIndex = 5;
-  game.app.stage.addChild(game.collision_visualization);
+  // game.app.stage.addChild(game.collision_visualization);
 
   const fpsDisplay = new FpsDisplay();
   const segment_manager = new SegmentManager();

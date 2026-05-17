@@ -1,6 +1,6 @@
 import { Mesh, Geometry, Shader, Texture, Ticker } from "pixi.js";
 import { vertex } from "./vertex_shader.js";
-import { ImpactParams, Voronoi } from "../voronoi/voronoi_diagram.js";
+import { ImpactParams, Voronoi } from "../voronoi/VoronoiFracture.js";
 import { PROJECTION, Segment } from "./segment.js";
 import { compose, rotateX, rotateY, scaleMat, SHARED_GEOMETRY, translate } from "./matrix_math.js";
 import { Game } from "../game.js";
@@ -23,7 +23,7 @@ void main() {
 const W = 800;
 const H = 800;
 
-const BREAK_DELAY = 1000;
+const BREAK_DELAY = 400;
 const FADE_START = 1300;
 const FADE_DURATION = 1500;
 
@@ -31,7 +31,7 @@ const FADE_DURATION = 1500;
 const CANVAS_TO_WORLD_X = 3.0 / W;
 const CANVAS_TO_WORLD_Y = 3.0 / H;
 
-const FRAGMENTS_TIME_MODIFIER = 0.8;
+const FRAGMENTS_TIME_MODIFIER = 1.0;
 
 interface CellFragment {
   mesh: Mesh<Geometry, Shader>;
@@ -62,6 +62,7 @@ export class BreakableSegment extends Segment {
   private snapX = 0;
   private snapY = 0;
   private snapZ = 0;
+  private snapZDrift = 0;
   private snapFaceRotX = 0;
   private snapFaceRotY = 0;
 
@@ -142,6 +143,9 @@ export class BreakableSegment extends Segment {
     const dt = ticker.deltaMS;
     this.elapsed += dt;
 
+    // Add the same movement as for normal segments
+    this.snapZDrift += (dt / 1000) * 3;
+
     if (!this.broken && this.elapsed >= BREAK_DELAY) {
       this.broken = true;
       this.remove();
@@ -166,10 +170,9 @@ export class BreakableSegment extends Segment {
       // f.angle += f.va * dt_adj;
 
       const model = compose(
-        translate(this.snapX, this.snapY, this.snapZ + f.offsetZ),
+        translate(this.snapX, this.snapY, this.snapZ + this.snapZDrift + f.offsetZ), // <-- snapZDrift added
         rotateX(this.snapFaceRotX),
         rotateY(this.snapFaceRotY),
-        // rotateZ(f.angle),
         translate(f.originX + f.driftX, f.originY + f.driftY, 0),
         scaleMat(f.scaleX, f.scaleY, 1.0),
       );

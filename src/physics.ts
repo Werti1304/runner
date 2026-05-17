@@ -2,7 +2,7 @@ import { Game } from "./game.js";
 import { COLLISION_Z_END, COLLISION_Z_START, Segment } from "./platforms/segment.js";
 import { rotateSide } from "./platforms/segment_side.js";
 import { Player } from "./player.js";
-import { ImpactParams } from "./voronoi/voronoi_diagram.js";
+import { ImpactParams } from "./voronoi/VoronoiFracture.js";
 
 const GRAVITY = 0.8;
 const JUMP_FORCE = -0.4;

@@ -1,11 +1,11 @@
 import { Texture } from "pixi.js";
 import { Game } from "../game.js";
-import { Voronoi } from "../voronoi/voronoi_diagram.js";
+import { Voronoi } from "../voronoi/VoronoiFracture.js";
 import { Segment } from "./segment.js";
 import { SIDES } from "./segment_side.js";
 import { BreakableSegment } from "./breakable_segment.js";
 
-const SEGMENT_SPEED_MULTIPLIER = 0.1;
+const SEGMENT_SPEED_MULTIPLIER = 1.0;
 const LEVEL_DIFFICULTY = 0.5; // 0 - 1
 const BREAKY_SEGMENTS = 0.1;
 
@@ -13,7 +13,7 @@ export class SegmentManager {
   private segments: Segment[] = [];
 
   private readonly laneOffsets = [-2, 0, 2];
-  private readonly segmentCount = 100;
+  private readonly segmentCount = 200;
   private readonly segmentDepth = 2;
 
   private OctagonTexture: Texture;
