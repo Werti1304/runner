@@ -1,9 +1,13 @@
+import { Texture } from "pixi.js";
 import { Game } from "../game";
+import { Voronoi } from "../voronoi/voronoi_diagram";
 import { Segment } from "./segment";
 import { SIDES } from "./segment_side";
+import { BreakableSegment } from "./breakable_segment";
 
-const SEGMENT_SPEED_MULTIPLIER = 2;
-const LEVEL_DIFFICULTY = 0.8; // 0 - 1
+const SEGMENT_SPEED_MULTIPLIER = 0.1;
+const LEVEL_DIFFICULTY = 0.5; // 0 - 1
+const BREAKY_SEGMENTS = 0.1;
 
 export class SegmentManager {
   private segments: Segment[] = [];
@@ -12,7 +16,10 @@ export class SegmentManager {
   private readonly segmentCount = 100;
   private readonly segmentDepth = 2;
 
+  private OctagonTexture: Texture;
+
   constructor() {
+    this.OctagonTexture = Voronoi.getOctagonTexture();
     this.createSegments();
   }
 
@@ -23,7 +30,16 @@ export class SegmentManager {
       for (const side of SIDES) {
         for (const lane of this.laneOffsets) {
           if (Math.random() > LEVEL_DIFFICULTY) {
-            this.segments.push(new Segment(z, side, lane));
+            if (Math.random() < BREAKY_SEGMENTS) {
+              // let texture = new Voronoi().getTexture();
+              // console.info(this.OctagonTexture);
+              this.segments.push(new BreakableSegment(z, side, lane, this.OctagonTexture));
+
+              // const sprite = new Sprite(this.OctagonTexture);
+              // Game.ins.app.stage.addChild(sprite);
+            } else {
+              this.segments.push(new Segment(z, side, lane));
+            }
           }
         }
       }
@@ -36,7 +52,7 @@ export class SegmentManager {
   }
 
   public tick(delta: number) {
-    Game.ins.segment_collisions = [ false, false, false ];
+    Game.ins.segment_collisions = [null, null, null];
     this.updateViewMatrix();
 
     for (let i = this.segments.length - 1; i >= 0; i--) {
@@ -48,7 +64,7 @@ export class SegmentManager {
         seg.update(delta * SEGMENT_SPEED_MULTIPLIER);
       }
     }
-    const c = Game.ins.segment_collisions;
-    console.log(`segments: [${c.map(v => v ? "█" : "░").join(" ")}] [${Segment.CurrentSide}]`);
+    // const c = Game.ins.segment_collisions;
+    // console.log(`segments: [${c.map((v) => (v ? "█" : "░")).join(" ")}] [${Segment.CurrentSide}]`);
   }
 }

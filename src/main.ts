@@ -11,6 +11,9 @@ import { SegmentManager } from "./platforms/segment_manager";
   const game = Game.ins;
   await game.init();
 
+  // const voronoi = new Voronoi();
+  // voronoi.draw(30, { x: 0.5, y: 0.5, force: 0.5 }, "noised-distance");
+
   // Player
   game.player.sprite.anchor.set(0.5);
   game.player.sprite.zIndex = 2;
