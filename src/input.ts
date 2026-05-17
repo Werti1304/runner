@@ -4,6 +4,14 @@ export function start_input_listeners() {
   window.addEventListener("keydown", (e) => {
     Game.ins.pressed_keys[e.code] = true;
     console.log("Pressed: ", e.code);
+
+    if (e.code == "KeyN") {
+      Game.ins.debug_show_distance_fields = !Game.ins.debug_show_distance_fields;
+    } else if (e.code == "KeyM") {
+      Game.ins.debug_show_seed_points = !Game.ins.debug_show_seed_points;
+    } else if (e.code == "KeyB") {
+      Game.ins.debug_show_noise_overlay = !Game.ins.debug_show_noise_overlay;
+    }
   });
 
   window.addEventListener("keyup", (e) => {
