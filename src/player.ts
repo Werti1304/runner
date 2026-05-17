@@ -10,11 +10,11 @@ export class Player {
 
   public drawPlayerSprite() {
     this.sprite.position.set(Game.ins.app.screen.width / 2, Game.ins.app.screen.height / 2);
-    this.sprite.scale = Game.ins.app.screen.height / 512;
+    this.sprite.scale = Game.ins.app.screen.height / 1024;
   }
 
   public async init() {
-    const texture = await Assets.load("/assets/bunny.png");
+    const texture = await Assets.load("/res/runner.png");
     this.sprite = new Sprite(texture);
   }
 }
