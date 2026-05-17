@@ -1,9 +1,9 @@
 import { Mesh, Geometry, Shader, Texture, Ticker } from "pixi.js";
-import { vertex } from "./vertex_shader";
-import { ImpactParams, Voronoi } from "../voronoi/voronoi_diagram";
-import { PROJECTION, Segment } from "./segment";
-import { compose, rotateX, rotateY, scaleMat, SHARED_GEOMETRY, translate } from "./matrix_math";
-import { Game } from "../game";
+import { vertex } from "./vertex_shader.js";
+import { ImpactParams, Voronoi } from "../voronoi/voronoi_diagram.js";
+import { PROJECTION, Segment } from "./segment.js";
+import { compose, rotateX, rotateY, scaleMat, SHARED_GEOMETRY, translate } from "./matrix_math.js";
+import { Game } from "../game.js";
 
 export const cellFragment = /* glsl */ `
 #version 300 es

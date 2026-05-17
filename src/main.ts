@@ -1,11 +1,11 @@
-import { Scheduler } from "./scheduler";
-import { process } from "./process";
-import { process_physics } from "./physics";
-import { Game } from "./game";
-import { start_input_listeners } from "./input";
-import { startWindowHandlers } from "./windows_events";
-import { FpsDisplay } from "./ui/fps_display";
-import { SegmentManager } from "./platforms/segment_manager";
+import { Scheduler } from "./scheduler.js";
+import { process } from "./process.js";
+import { process_physics } from "./physics.js";
+import { Game } from "./game.js";
+import { start_input_listeners } from "./input.js";
+import { startWindowHandlers } from "./windows_events.js";
+import { FpsDisplay } from "./ui/fps_display.js";
+import { SegmentManager } from "./platforms/segment_manager.js";
 
 (async () => {
   const game = Game.ins;

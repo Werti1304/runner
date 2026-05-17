@@ -1,9 +1,9 @@
 import { Texture } from "pixi.js";
-import { Game } from "../game";
-import { Voronoi } from "../voronoi/voronoi_diagram";
-import { Segment } from "./segment";
-import { SIDES } from "./segment_side";
-import { BreakableSegment } from "./breakable_segment";
+import { Game } from "../game.js";
+import { Voronoi } from "../voronoi/voronoi_diagram.js";
+import { Segment } from "./segment.js";
+import { SIDES } from "./segment_side.js";
+import { BreakableSegment } from "./breakable_segment.js";
 
 const SEGMENT_SPEED_MULTIPLIER = 0.1;
 const LEVEL_DIFFICULTY = 0.5; // 0 - 1

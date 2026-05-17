@@ -1,6 +1,6 @@
 import { Mesh, Geometry, Shader, Texture } from "pixi.js";
-import { vertex } from "./vertex_shader";
-import { fragment } from "./fragment_shader";
+import { vertex } from "./vertex_shader.js";
+import { fragment } from "./fragment_shader.js";
 import {
   compose,
   IDENTITY,
@@ -11,10 +11,10 @@ import {
   scaleMat,
   SHARED_GEOMETRY,
   translate,
-} from "./matrix_math";
-import { Game } from "../game";
-import { Side, SIDE_CONFIG, SIDES } from "./segment_side";
-import { ImpactParams } from "../voronoi/voronoi_diagram";
+} from "./matrix_math.js";
+import { Game } from "../game.js";
+import { Side, SIDE_CONFIG, SIDES } from "./segment_side.js";
+import { ImpactParams } from "../voronoi/voronoi_diagram.js";
 
 export let PROJECTION = perspective(Math.PI / 3, window.innerWidth / window.innerHeight, 0.1, 200);
 
@@ -123,7 +123,8 @@ export class Segment {
     this.valid = true;
   }
 
-  public onCollide(_params: ImpactParams) {
+  /* eslint-disable */
+  public onCollide(_: ImpactParams) {
     return;
   }
 

@@ -1,4 +1,4 @@
-import { Game } from "./game";
+import { Game } from "./game.js";
 
 export function process(delta: number) {
   Game.ins.segment_camera.tick(delta);

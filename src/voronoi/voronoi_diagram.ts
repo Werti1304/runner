@@ -1,5 +1,5 @@
 import { BufferImageSource, Graphics, RenderTexture, Sprite, Texture } from "pixi.js";
-import { Game } from "../game";
+import { Game } from "../game.js";
 
 // I DONT KNOW WHY IT HAS TO BE THIS EXACT VALUE OR EVERYTHING BREAKS .-.
 export const W = 500;
@@ -334,7 +334,8 @@ export class Voronoi {
     return g;
   }
 
-  private drawOverlays(sites: Site[], _impact: ImpactParams): Graphics {
+  /* eslint-disable */
+  private drawOverlays(sites: Site[], _: ImpactParams): Graphics {
     // const ix = impact.x * W;
     // const iy = impact.y * H;
 

@@ -1,4 +1,4 @@
-import { Game } from "../game";
+import { Game } from "../game.js";
 import { Text } from "pixi.js";
 
 export class FpsDisplay {

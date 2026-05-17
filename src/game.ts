@@ -1,9 +1,9 @@
 import { Application, Graphics } from "pixi.js";
-import { Player } from "./player";
-import { onWindowResize } from "./windows_events";
-import { SegmentCamera } from "./platforms/segment_camera";
-import { ground_y, screen_height, wall_x_left, wall_x_right } from "./physics";
-import { Segment } from "./platforms/segment";
+import { Player } from "./player.js";
+import { onWindowResize } from "./windows_events.js";
+import { SegmentCamera } from "./platforms/segment_camera.js";
+import { ground_y, screen_height, wall_x_left, wall_x_right } from "./physics.js";
+import { Segment } from "./platforms/segment.js";
 
 export class Game {
   static #instance: Game;

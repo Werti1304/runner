@@ -1,5 +1,5 @@
 import { Assets, Sprite } from "pixi.js";
-import { Game } from "./game";
+import { Game } from "./game.js";
 
 export class Player {
   public sprite: Sprite = new Sprite();

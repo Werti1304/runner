@@ -1,8 +1,8 @@
-import { Game } from "./game";
-import { COLLISION_Z_END, COLLISION_Z_START, Segment } from "./platforms/segment";
-import { rotateSide } from "./platforms/segment_side";
-import { Player } from "./player";
-import { ImpactParams } from "./voronoi/voronoi_diagram";
+import { Game } from "./game.js";
+import { COLLISION_Z_END, COLLISION_Z_START, Segment } from "./platforms/segment.js";
+import { rotateSide } from "./platforms/segment_side.js";
+import { Player } from "./player.js";
+import { ImpactParams } from "./voronoi/voronoi_diagram.js";
 
 const GRAVITY = 0.8;
 const JUMP_FORCE = -0.4;
@@ -38,8 +38,8 @@ updateCollisionBounds();
 window.addEventListener("resize", updateCollisionBounds);
 
 export function process_physics(delta: number) {
-  let game = Game.ins;
-  let player = game.player;
+  const game = Game.ins;
+  const player = game.player;
 
   game.drawCollisionVisualization();
 
@@ -100,7 +100,7 @@ export function process_physics(delta: number) {
 }
 
 function wall_collide_handler(left: boolean) {
-  let player = Game.ins.player;
+  const player = Game.ins.player;
 
   const normalizedY = player.sprite.y / screen_height;
 
