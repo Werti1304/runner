@@ -91,26 +91,22 @@ export function compose(...matrices: Mat4[]): Mat4 {
 }
 
 export const positions = new Float32Array([
-    // front
-    -1, -1,  1,
-     1, -1,  1,
-     1,  1,  1,
-    -1,  1,  1,
-
-    // back
-    -1, -1, -1,
-     1, -1, -1,
-     1,  1, -1,
-    -1,  1, -1,
+  -0.5, -0.5, 0,
+   0.5, -0.5, 0,
+   0.5,  0.5, 0,
+  -0.5,  0.5, 0,
 ]);
 
 export const indices = new Uint16Array([
-    0, 1, 2,  0, 2, 3,
-    5, 4, 7,  5, 7, 6,
-    3, 2, 6,  3, 6, 7,
-    4, 5, 1,  4, 1, 0,
-    1, 5, 6,  1, 6, 2,
-    4, 0, 3,  4, 3, 7,
+  0, 1, 2,
+  0, 2, 3,
+]);
+
+export const uvs = new Float32Array([
+  0, 1,
+  1, 1,
+  1, 0,
+  0, 0,
 ]);
 
 export const SHARED_GEOMETRY = new Geometry({
@@ -120,9 +116,17 @@ export const SHARED_GEOMETRY = new Geometry({
                 data: positions,
                 usage: BufferUsage.VERTEX,
             }),
-
             format: "float32x3",
             stride: 12,
+            offset: 0,
+        },
+        aUV: {
+            buffer: new Buffer({
+                data: uvs,
+                usage: BufferUsage.VERTEX,
+            }),
+            format: "float32x2",
+            stride: 8,
             offset: 0,
         },
     },
