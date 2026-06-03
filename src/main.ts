@@ -26,11 +26,12 @@ import { SegmentManager } from "./platforms/segment_manager.js";
   // expose on Game so input.ts and fps_display.ts can reach it
   Game.ins.scheduler = scheduler;
 
+  setInterval(() => fpsDisplay.tick(), 1000);
+
   scheduler.start(
     (delta) => {
       process(delta);
       fpsDisplay.updateRender();
-      fpsDisplay.tick();
     },
     (dt) => {
       process_physics(dt);

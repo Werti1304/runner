@@ -1,7 +1,9 @@
 import * as PIXI from "pixi.js";
 import { Game } from "../game.js";
+import { VoronoiDebug } from "../voronoi/VoronoiDebug.js";
 
 let pause_container: PIXI.Container | null = null;
+export let voronoiDebug: VoronoiDebug | null = null;
 
 export function toggle_pause(): void {
   if (Game.ins.paused) {
@@ -17,6 +19,9 @@ function pause(): void {
   Game.ins.paused = true;
 
   pause_container = new PIXI.Container();
+
+  voronoiDebug = new VoronoiDebug();
+  voronoiDebug.show();
 
   // Semi-transparent rect to make the game look darker
   const overlay = new PIXI.Graphics();
@@ -68,5 +73,8 @@ function unpause(): void {
     Game.ins.app.stage.removeChild(pause_container);
     pause_container.destroy({ children: true });
     pause_container = null;
+
+    voronoiDebug?.hide();
+    voronoiDebug = null;
   }
 }

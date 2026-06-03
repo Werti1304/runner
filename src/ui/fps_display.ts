@@ -51,6 +51,7 @@ export class FpsDisplay {
       const distFields = Game.ins.debug_show_distance_fields ? "ON" : "OFF";
       const seedPoints = Game.ins.debug_show_seed_points ? "ON" : "OFF";
       const noiseOverlay = Game.ins.debug_show_noise_overlay ? "ON" : "OFF";
+      const noise = Game.ins.debug_voronoi_noise_enabled ? "ON" : "OFF";
 
       this.label.text = [
         `FPS: ${fps.toFixed(1)} (target: ${targetRender})[1/2]`,
@@ -58,6 +59,7 @@ export class FpsDisplay {
         `Distance fields to cell boundary[N]: ${distFields}`,
         `Voronoi Seed Points[M]: ${seedPoints}`,
         `Noise-Overlay on[B]: ${noiseOverlay}`,
+        `Noise on[V]: ${noise}`,
       ].join("\n");
 
       this.frameCount = 0;
