@@ -23,6 +23,8 @@ export class Game {
   // In the same tick, segments are set to true if they're in range
   segment_collisions: (Segment | null)[] = [null, null, null];
 
+  paused: boolean = false;
+
   private constructor() {}
 
   public async init() {

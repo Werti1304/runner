@@ -1,4 +1,5 @@
 import { Game } from "./game.js";
+import { toggle_pause } from "./ui/pause.js";
 
 export function start_input_listeners() {
   window.addEventListener("keydown", (e) => {
@@ -11,6 +12,8 @@ export function start_input_listeners() {
       Game.ins.debug_show_seed_points = !Game.ins.debug_show_seed_points;
     } else if (e.code == "KeyB") {
       Game.ins.debug_show_noise_overlay = !Game.ins.debug_show_noise_overlay;
+    } else if (e.code === "Escape") {
+      toggle_pause();
     }
   });
 
