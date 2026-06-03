@@ -423,6 +423,72 @@ export class Voronoi {
     return mask;
   }
 
+  private computeVoronoiEdgeDistances(
+    src: Array<{ siteId: number; seedX: number; seedY: number }>,
+    sites: Site[],
+    maskGrid: Uint8Array,
+    width: number,
+    height: number,
+  ): Float32Array {
+    const distGrid = new Float32Array(width * height);
+
+    for (let py = 0; py < height; py++) {
+      for (let px = 0; px < width; px++) {
+        const idx = py * width + px;
+        if (!maskGrid[idx] || src[idx].siteId < 0) continue;
+
+        const pa = sites[src[idx].siteId];
+        let minEdgeDist = Infinity;
+
+        // check all sites
+        // not very efficient
+        for (const pb of sites) {
+          if (pb.id === pa.id) continue;
+
+          // midpoint between pa and pb
+          const mx = (pa.x + pb.x) / 2;
+          const my = (pa.y + pb.y) / 2;
+
+          // direction pa -> pb
+          const dx = pb.x - pa.x;
+          const dy = pb.y - pa.y;
+          const len = Math.sqrt(dx * dx + dy * dy);
+
+          // normal distance from x to the Voronoi edge
+          const d = ((px - mx) * dx + (py - my) * dy) / len;
+
+          if (d < minEdgeDist) {
+            minEdgeDist = d;
+          }
+        }
+
+        distGrid[idx] = Math.max(0, minEdgeDist);
+      }
+    }
+
+    return distGrid;
+  }
+
+  // applies noise to dist grid
+  private applyNoiseToDistField(
+    distGrid: Float32Array,
+    maskGrid: Uint8Array,
+    width: number,
+    height: number,
+    noiseScale: number,
+    noiseStrength: number,
+  ): void {
+    for (let py = 0; py < height; py++) {
+      for (let px = 0; px < width; px++) {
+        const idx = py * width + px;
+        if (!maskGrid[idx]) continue;
+
+        const n = (this.valueNoise(px, py, noiseScale) - 0.5) * noiseStrength;
+        distGrid[idx] = Math.max(0, distGrid[idx] + n);
+      }
+    }
+  }
+
   // based on https://en.wikipedia.org/wiki/Jump_flooding_algorithm
   private runJFA(
     sites: Site[],
@@ -509,15 +575,12 @@ export class Voronoi {
 
     // extract typed output arrays
     const siteGrid = new Int32Array(N);
-    const distGrid = new Float32Array(N);
     for (let py = 0; py < height; py++) {
       for (let px = 0; px < width; px++) {
-        const idx = py * width + px;
-        const { siteId, seedX, seedY } = src[idx];
-        siteGrid[idx] = siteId;
-        distGrid[idx] = siteId >= 0 ? Math.sqrt(sqDist(px, py, seedX, seedY)) : 0;
+        siteGrid[py * width + px] = src[py * width + px].siteId;
       }
     }
+    const distGrid = this.computeVoronoiEdgeDistances(src, sites, maskGrid, width, height);
 
     return { siteGrid, distGrid };
   }
@@ -546,25 +609,5 @@ export class Voronoi {
       hash(xi, yi + 1) * (1 - ux) * uy +
       hash(xi + 1, yi + 1) * ux * uy
     );
-  }
-
-  // applies noise to dist grid
-  private applyNoiseToDistField(
-    distGrid: Float32Array,
-    maskGrid: Uint8Array,
-    width: number,
-    height: number,
-    noiseScale: number,
-    noiseStrength: number,
-  ): void {
-    for (let py = 0; py < height; py++) {
-      for (let px = 0; px < width; px++) {
-        const idx = py * width + px;
-        if (!maskGrid[idx]) continue;
-
-        const n = (this.valueNoise(px, py, noiseScale) - 0.5) * noiseStrength;
-        distGrid[idx] = Math.max(0, distGrid[idx] + n);
-      }
-    }
   }
 }
