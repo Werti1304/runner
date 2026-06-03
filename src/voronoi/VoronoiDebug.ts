@@ -37,7 +37,7 @@ export class VoronoiDebug {
     };
 
     // const texture = this.voronoi.getTexture(30, impact);
-    const texture = this.voronoi.getTexture(30, 15, { x: 0.5, y: 0.5, force: 0.8 });
+    const texture = this.voronoi.getTexture(Math.random() * 100, 15, { x: 0.5, y: 0.5, force: 0.8 });
 
     this.sprite = new Sprite(texture);
     this.sprite.anchor.set(0, 0.5);

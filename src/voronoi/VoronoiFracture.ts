@@ -28,8 +28,8 @@ interface Site {
 export type RenderMode = "cells" | "distance" | "noised-distance";
 
 export class Voronoi {
-  private readonly NOISE_SCALE = 40;
-  private readonly NOISE_STRENGTH = 18;
+  private readonly NOISE_SCALE = 5;
+  private readonly NOISE_STRENGTH = 5;
 
   // Returns white octagon texture
   public static getOctagonTexture(): Texture {
@@ -77,7 +77,7 @@ export class Voronoi {
     }>;
   } {
     const seed = Math.random();
-    const { renderTexture, sites, siteGrid, maskGrid } = this.renderToTexture(numSites, seed, impact);
+    const { renderTexture, sites, siteGrid, distGrid, maskGrid } = this.renderToTexture(numSites, seed, impact);
 
     const texture = renderTexture;
     const ix = impact.x * W;
@@ -88,7 +88,7 @@ export class Voronoi {
     const atlasPixels = renderer.extract.pixels(renderTexture);
 
     const cells = sites.flatMap((_site, i) => {
-      // find bounding box of current cell based on sitegrid and maskgrid
+      // Bounding box scan — exclude eroded pixels
       let minX = W,
         minY = H,
         maxX = 0,
@@ -96,7 +96,7 @@ export class Voronoi {
       for (let py = 0; py < H; py++) {
         for (let px = 0; px < W; px++) {
           const idx = py * W + px;
-          if (siteGrid[idx] === i && maskGrid[idx]) {
+          if (siteGrid[idx] === i && maskGrid[idx] && !this.isErodedAway(px, py, distGrid[idx])) {
             if (px < minX) minX = px;
             if (py < minY) minY = py;
             if (px > maxX) maxX = px;
@@ -105,7 +105,7 @@ export class Voronoi {
         }
       }
 
-      // site landed outside the mask entirely, skip it
+      // Site landed outside the mask entirely, or fully eroded away
       if (minX > maxX || minY > maxY) return [];
 
       const cw = maxX - minX + 1;
@@ -118,7 +118,7 @@ export class Voronoi {
       for (let py = minY; py <= maxY; py++) {
         for (let px = minX; px <= maxX; px++) {
           const srcIdx = py * W + px;
-          if (siteGrid[srcIdx] !== i || !maskGrid[srcIdx]) continue;
+          if (siteGrid[srcIdx] !== i || !maskGrid[srcIdx] || this.isErodedAway(px, py, distGrid[srcIdx])) continue;
 
           const dstIdx = ((py - minY) * cw + (px - minX)) * 4;
           const srcPx = srcIdx * 4;
@@ -171,6 +171,7 @@ export class Voronoi {
     renderTexture: RenderTexture;
     sites: Site[];
     siteGrid: Int32Array;
+    distGrid: Float32Array;
     maskGrid: Uint8Array;
   } {
     // generate numSites sites based on impact force and position
@@ -180,20 +181,7 @@ export class Voronoi {
     const octPoly = this.buildOctagonPoly(W / 2, H / 2, 250);
     const maskGrid = this.buildMaskGrid(octPoly, W, H);
 
-    const { edgeDistPerSite } = this.runJFA(sites, maskGrid, W, H);
-
-    if (Game.ins.debug_voronoi_noise_enabled) {
-      this.applyNoiseToEdgeDistPerSite(edgeDistPerSite, maskGrid, sites.length, W, H);
-    }
-
-    const siteGrid = this.recomputeSiteGridFromNoisedDistances(edgeDistPerSite, maskGrid, sites.length, W, H);
-
-    // distGrid for shading — just read the winning site's noised distance
-    const distGrid = new Float32Array(W * H);
-    for (let i = 0; i < W * H; i++) {
-      const s = siteGrid[i];
-      if (s >= 0) distGrid[i] = Math.max(0, edgeDistPerSite[i * sites.length + s]);
-    }
+    const { siteGrid, distGrid } = this.runJFA(sites, maskGrid, W, H);
 
     // visualizations
     const pixels = this.renderToPixelBuffer(sites, siteGrid, distGrid, maskGrid, W, H);
@@ -256,7 +244,13 @@ export class Voronoi {
     edgesGfx.destroy();
     overlayGfx.destroy();
 
-    return { renderTexture, sites, siteGrid, maskGrid };
+    return { renderTexture, sites, siteGrid, distGrid, maskGrid };
+  }
+
+  private isErodedAway(px: number, py: number, dist: number): boolean {
+    if (!Game.ins.debug_voronoi_noise_enabled) return false;
+    const threshold = 2 + this.valueNoise(px, py, this.NOISE_SCALE) * this.NOISE_STRENGTH;
+    return dist < threshold;
   }
 
   private renderToPixelBuffer(
@@ -279,8 +273,12 @@ export class Voronoi {
       for (let px = 0; px < width; px++) {
         const idx = py * width + px;
 
-        // Outside silhouette → fully transparent
         if (!maskGrid[idx] || siteGrid[idx] < 0) {
+          data[idx * 4 + 3] = 0;
+          continue;
+        }
+
+        if (this.isErodedAway(px, py, distGrid[idx])) {
           data[idx * 4 + 3] = 0;
           continue;
         }
@@ -443,115 +441,13 @@ export class Voronoi {
     return mask;
   }
 
-  private computeVoronoiEdgeDistances(
-    src: Array<{ siteId: number; seedX: number; seedY: number }>,
-    sites: Site[],
-    maskGrid: Uint8Array,
-    width: number,
-    height: number,
-  ): Float32Array {
-    const distGrid = new Float32Array(width * height);
-
-    for (let py = 0; py < height; py++) {
-      for (let px = 0; px < width; px++) {
-        const idx = py * width + px;
-        if (!maskGrid[idx] || src[idx].siteId < 0) continue;
-
-        const pa = sites[src[idx].siteId];
-        let minEdgeDist = Infinity;
-
-        // check all sites
-        // not very efficient
-        for (const pb of sites) {
-          if (pb.id === pa.id) continue;
-
-          // midpoint between pa and pb
-          const mx = (pa.x + pb.x) / 2;
-          const my = (pa.y + pb.y) / 2;
-
-          // direction pa -> pb
-          const dx = pb.x - pa.x;
-          const dy = pb.y - pa.y;
-
-          // normal distance from x to the Voronoi edge
-          const d = (pb.x - pa.x) ** 2 + (pb.y - pa.y) ** 2;
-          const len = Math.sqrt(d);
-          const edgeDist = ((pb.x - px) ** 2 + (pb.y - py) ** 2 - ((pa.x - px) ** 2 + (pa.y - py) ** 2)) / (2 * len);
-          if (edgeDist < minEdgeDist) minEdgeDist = edgeDist;
-
-          if (d < minEdgeDist) {
-            minEdgeDist = d;
-          }
-        }
-
-        distGrid[idx] = Math.max(0, minEdgeDist);
-      }
-    }
-
-    return distGrid;
-  }
-
-  private applyNoiseToEdgeDistPerSite(
-    edgeDistPerSite: Float32Array,
-    maskGrid: Uint8Array,
-    sitesLength: number,
-    width: number,
-    height: number,
-  ): void {
-    for (let py = 0; py < height; py++) {
-      for (let px = 0; px < width; px++) {
-        const idx = py * width + px;
-        if (!maskGrid[idx]) continue;
-
-        // compute noise once per pixel, apply to all sites
-        const n = (this.valueNoise(px, py, this.NOISE_SCALE) - 0.5) * this.NOISE_STRENGTH;
-
-        for (let s = 0; s < sitesLength; s++) {
-          edgeDistPerSite[idx * sitesLength + s] += n;
-        }
-      }
-    }
-  }
-
-  private recomputeSiteGridFromNoisedDistances(
-    edgeDistPerSite: Float32Array,
-    maskGrid: Uint8Array,
-    sitesLength: number,
-    width: number,
-    height: number,
-  ): Int32Array {
-    const siteGrid = new Int32Array(width * height).fill(-1);
-
-    for (let py = 0; py < height; py++) {
-      for (let px = 0; px < width; px++) {
-        const idx = py * width + px;
-        if (!maskGrid[idx]) continue;
-
-        let bestSite = -1;
-        let bestDist = -Infinity;
-
-        for (let s = 0; s < sitesLength; s++) {
-          const d = edgeDistPerSite[idx * sitesLength + s];
-          if (d > bestDist) {
-            bestDist = d;
-            bestSite = s;
-          }
-        }
-
-        siteGrid[idx] = bestSite;
-      }
-    }
-
-    return siteGrid;
-  }
-
   // based on https://en.wikipedia.org/wiki/Jump_flooding_algorithm
   private runJFA(
     sites: Site[],
     maskGrid: Uint8Array,
     width: number,
     height: number,
-  ): { edgeDistPerSite: Float32Array } {
+  ): { siteGrid: Int32Array; distGrid: Float32Array } {
     const N = width * height;
     const EMPTY = -1;
 
@@ -631,31 +527,33 @@ export class Voronoi {
 
     // extract typed output arrays
     const siteGrid = new Int32Array(N);
-    const edgeDistPerSite = new Float32Array(N * sites.length).fill(-Infinity);
+    const distGrid = new Float32Array(N);
 
     for (let py = 0; py < height; py++) {
       for (let px = 0; px < width; px++) {
         const idx = py * width + px;
-        siteGrid[idx] = src[idx].siteId;
-        if (!maskGrid[idx]) continue;
+        const assignedId = src[idx].siteId;
+        siteGrid[idx] = assignedId;
 
-        for (const pa of sites) {
-          let minEdgeDist = Infinity;
-          for (const pb of sites) {
-            if (pb.id === pa.id) continue;
-            const dx = pb.x - pa.x;
-            const dy = pb.y - pa.y;
-            const len = Math.sqrt(dx * dx + dy * dy);
-            // signed distance from p to the pa/pb bisector, positive on pa's side
-            const d = (sqDist(px, py, pb.x, pb.y) - sqDist(px, py, pa.x, pa.y)) / (2 * len);
-            if (d < minEdgeDist) minEdgeDist = d;
-          }
-          edgeDistPerSite[idx * sites.length + pa.id] = minEdgeDist;
+        if (!maskGrid[idx] || assignedId < 0) continue;
+
+        const pa = sites[assignedId];
+        let minEdgeDist = Infinity;
+
+        for (const pb of sites) {
+          if (pb.id === pa.id) continue;
+          const dx = pb.x - pa.x;
+          const dy = pb.y - pa.y;
+          const len = Math.sqrt(dx * dx + dy * dy);
+          const d = (sqDist(px, py, pb.x, pb.y) - sqDist(px, py, pa.x, pa.y)) / (2 * len);
+          if (d < minEdgeDist) minEdgeDist = d;
         }
+
+        distGrid[idx] = Math.max(0, minEdgeDist);
       }
     }
 
-    return { edgeDistPerSite };
+    return { siteGrid, distGrid };
   }
 
   // value noise based loosely on this: https://thebookofshaders.com/11
