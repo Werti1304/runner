@@ -28,7 +28,7 @@ interface Site {
 export type RenderMode = "cells" | "distance" | "noised-distance";
 
 export class Voronoi {
-  private readonly NOISE_SCALE = 5;
+  private readonly NOISE_SCALE = 40;
   private readonly NOISE_STRENGTH = 5;
 
   // Returns white octagon texture
@@ -359,7 +359,7 @@ export class Voronoi {
     // impact point marker
     const ix = impact.x * W;
     const iy = impact.y * H;
-    g.circle(ix, iy, 6).fill({ color: 0xff2200, alpha: 1 });
+    g.circle(ix, iy, 5).fill({ color: 0xff2200, alpha: 1 });
 
     return g;
   }

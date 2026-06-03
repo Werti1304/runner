@@ -31,13 +31,13 @@ export class VoronoiDebug {
     this.removeSprite();
 
     const impact = {
-      x: Math.random(),
-      y: Math.random(),
-      force: 0.3 + Math.random() * 0.6,
+      x: Math.random() * 0.6 + 0.2,
+      y: Math.random() * 0.6 + 0.2,
+      force: 0.4 + Math.random() * 0.55,
     };
 
     // const texture = this.voronoi.getTexture(30, impact);
-    const texture = this.voronoi.getTexture(Math.random() * 100, 15, { x: 0.5, y: 0.5, force: 0.8 });
+    const texture = this.voronoi.getTexture(Math.random() * 100, 30, impact);
 
     this.sprite = new Sprite(texture);
     this.sprite.anchor.set(0, 0.5);

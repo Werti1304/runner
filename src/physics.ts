@@ -1,6 +1,6 @@
 import { Game } from "./game.js";
 import { COLLISION_Z_END, COLLISION_Z_START, Segment } from "./platforms/segment.js";
-import { rotateSide } from "./platforms/segment_side.js";
+import { rotateSide, SIDES } from "./platforms/segment_side.js";
 import { Player } from "./player.js";
 import { ImpactParams } from "./voronoi/VoronoiFracture.js";
 
@@ -148,7 +148,11 @@ function isPlayerOnGround(player: Player, segment_collisions: (Segment | null)[]
       on_ground = true;
 
       const seg_start = wall_x_left + s * segment_width;
-      const impact_x = ((player.sprite.x - seg_start) / segment_width) * 0.8 + 0.1; // 0.1 to 0.9
+      const isFlipped = segment_collisions[s]!.side == SIDES[0] || segment_collisions[s]!.side == SIDES[3];
+      // TODO: This didn't work, fix impact point on segment if have time
+      const impact_x = isFlipped
+        ? 1 - (((player.sprite.x - seg_start) / segment_width) * 0.8 + 0.1)
+        : ((player.sprite.x - seg_start) / segment_width) * 0.8 + 0.1;
       // Stupid formula to go from current z to a value between 0.1 and 0.9
       const impact_y =
         ((segment_collisions[s]!.z - COLLISION_Z_START) / (COLLISION_Z_END - COLLISION_Z_START)) * 0.8 + 0.1;

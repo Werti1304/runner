@@ -33,7 +33,7 @@ export class Segment {
   protected x: number;
   protected y: number;
   protected lane: number;
-  protected side: Side;
+  public side: Side;
   protected faceRotationX: number; // replaces single `rotation` field
   protected faceRotationY: number;
 
