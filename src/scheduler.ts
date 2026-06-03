@@ -5,61 +5,98 @@ export type PhysicsFn = (dt: number) => void;
 export type RenderFn = (alpha: number) => void;
 
 export class Scheduler {
-  private fixedDt: number;
-  private maxSteps: number;
+  private targetRenderFps: number;
+  private targetPhysicsFps: number;
+  private physicsDt: number;
 
-  private accumulator = 0;
-  private lastTime = 0;
-  private running = false;
+  private intervalId: ReturnType<typeof setInterval> | null = null;
 
-  constructor(fps: number = 30, maxSteps: number = 5) {
-    this.fixedDt = 1 / fps;
-    this.maxSteps = maxSteps;
+  private processCallback: ProcessFn | null = null;
+  private physicsCallback: PhysicsFn | null = null;
+  private renderCallback: RenderFn | null = null;
+
+  private lastPhysicsTime: number = 0;
+
+  constructor(physicsFps: number = 60, renderFps: number = 60) {
+    this.targetPhysicsFps = physicsFps;
+    this.targetRenderFps = renderFps;
+    this.physicsDt = 1 / physicsFps;
+  }
+
+  public setPhysicsFps(fps: number) {
+    this.targetPhysicsFps = Math.max(5, fps);
+    this.physicsDt = 1 / this.targetPhysicsFps;
+
+    if (this.intervalId !== null) {
+      this.resetPhysicsLoop();
+      this.startPhysicsLoop();
+    }
+  }
+
+  public setRenderFps(fps: number) {
+    this.targetRenderFps = Math.max(5, fps);
+    Game.ins.app.ticker.maxFPS = this.targetRenderFps;
+  }
+
+  public adjustPhysicsFps(delta: number) {
+    this.setPhysicsFps(this.targetPhysicsFps + delta);
+  }
+
+  public adjustRenderFps(delta: number) {
+    this.setRenderFps(this.targetRenderFps + delta);
+  }
+
+  public getTargetPhysicsFps(): number {
+    return this.targetPhysicsFps;
+  }
+
+  public getTargetRenderFps(): number {
+    return this.targetRenderFps;
   }
 
   start(process: ProcessFn, process_physics: PhysicsFn, render?: RenderFn) {
-    if (this.running) return;
+    if (this.intervalId !== null) return;
 
-    this.running = true;
-    this.lastTime = performance.now();
+    this.processCallback = process;
+    this.physicsCallback = process_physics;
+    this.renderCallback = render ?? null;
 
-    const loop = (currentTime: number) => {
-      if (!this.running) return;
-
-      let deltaSeconds = (currentTime - this.lastTime) / 1000;
-      this.lastTime = currentTime;
-
-      if (!Game.ins.paused) {
-        // avoid huge jumps (tab switch, lag spike)
-        deltaSeconds = Math.min(deltaSeconds, 0.25);
-
-        // run variable update
-        process(deltaSeconds);
-
-        // accumulate time for fixed updates
-        this.accumulator += deltaSeconds;
-
-        let steps = 0;
-
-        while (this.accumulator >= this.fixedDt && steps < this.maxSteps) {
-          process_physics(this.fixedDt);
-          this.accumulator -= this.fixedDt;
-          steps++;
-        }
-
-        // interpolation factor
-        const alpha = this.accumulator / this.fixedDt;
-
-        if (render) {
-          render(alpha);
-        }
-      }
-      requestAnimationFrame(loop);
-    };
-    requestAnimationFrame(loop);
+    this.startRenderLoop();
+    this.startPhysicsLoop();
   }
 
-  stop() {
-    this.running = false;
+  private startRenderLoop() {
+    Game.ins.app.ticker.maxFPS = this.targetRenderFps;
+
+    Game.ins.app.ticker.add((ticker) => {
+      if (Game.ins.paused) return;
+
+      const delta = ticker.deltaMS / 1000;
+
+      this.processCallback?.(delta);
+
+      const timeSinceLastPhysics = (performance.now() - this.lastPhysicsTime) / 1000;
+      const alpha = Math.min(timeSinceLastPhysics / this.physicsDt, 1);
+      this.renderCallback?.(alpha);
+    });
+  }
+
+  private startPhysicsLoop() {
+    this.lastPhysicsTime = performance.now();
+    const intervalMs = this.physicsDt * 1000;
+
+    this.intervalId = setInterval(() => {
+      if (Game.ins.paused) return;
+
+      this.physicsCallback?.(this.physicsDt);
+      this.lastPhysicsTime = performance.now();
+    }, intervalMs);
+  }
+
+  private resetPhysicsLoop() {
+    if (this.intervalId !== null) {
+      clearInterval(this.intervalId);
+      this.intervalId = null;
+    }
   }
 }

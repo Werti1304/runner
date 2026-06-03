@@ -4,6 +4,7 @@ import { onWindowResize } from "./windows_events.js";
 import { SegmentCamera } from "./platforms/segment_camera.js";
 import { ground_y, screen_height, wall_x_left, wall_x_right } from "./physics.js";
 import { Segment } from "./platforms/segment.js";
+import { Scheduler } from "./scheduler.js";
 
 export class Game {
   static #instance: Game;
@@ -12,6 +13,7 @@ export class Game {
   player: Player = new Player();
   collision_visualization: Graphics = new Graphics();
   segment_camera: SegmentCamera = new SegmentCamera();
+  scheduler!: Scheduler;
 
   pressed_keys: Record<string, boolean> = {};
 

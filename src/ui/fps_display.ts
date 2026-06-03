@@ -45,13 +45,20 @@ export class FpsDisplay {
       const fps = this.frameCount / elapsed;
       const pps = this.physicsCount / elapsed;
 
-      // this.label.text = `FPS: ${fps.toFixed(1)} | Physics: ${pps.toFixed(1)}`;
+      const targetRender = Game.ins.scheduler.getTargetRenderFps();
+      const targetPhysics = Game.ins.scheduler.getTargetPhysicsFps();
 
       const distFields = Game.ins.debug_show_distance_fields ? "ON" : "OFF";
       const seedPoints = Game.ins.debug_show_seed_points ? "ON" : "OFF";
       const noiseOverlay = Game.ins.debug_show_noise_overlay ? "ON" : "OFF";
 
-      this.label.text = `FPS: ${fps.toFixed(1)} | Physics: ${pps.toFixed(1)}\nDistance fields to cell boundary[N]: ${distFields}\nVoronoi Seed Points[M]: ${seedPoints}\ndNoise-Overlay on[B]: ${noiseOverlay}`;
+      this.label.text = [
+        `FPS: ${fps.toFixed(1)} (target: ${targetRender})[1/2]`,
+        `Physics: ${pps.toFixed(1)} (target: ${targetPhysics})[3/4]`,
+        `Distance fields to cell boundary[N]: ${distFields}`,
+        `Voronoi Seed Points[M]: ${seedPoints}`,
+        `Noise-Overlay on[B]: ${noiseOverlay}`,
+      ].join("\n");
 
       this.frameCount = 0;
       this.physicsCount = 0;

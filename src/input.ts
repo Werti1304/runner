@@ -14,6 +14,14 @@ export function start_input_listeners() {
       Game.ins.debug_show_noise_overlay = !Game.ins.debug_show_noise_overlay;
     } else if (e.code === "Escape") {
       toggle_pause();
+    } else if (e.code === "Digit1") {
+      Game.ins.scheduler.adjustRenderFps(-5);
+    } else if (e.code === "Digit2") {
+      Game.ins.scheduler.adjustRenderFps(+5);
+    } else if (e.code === "Digit3") {
+      Game.ins.scheduler.adjustPhysicsFps(-5);
+    } else if (e.code === "Digit4") {
+      Game.ins.scheduler.adjustPhysicsFps(+5);
     }
   });
 
