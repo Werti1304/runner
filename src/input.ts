@@ -1,5 +1,5 @@
 import { Game } from "./game.js";
-import { toggle_pause, voronoiDebug } from "./ui/pause.js";
+import { massSpringDebug, toggle_pause, voronoiDebug } from "./ui/pause.js";
 
 export function start_input_listeners() {
   window.addEventListener("keydown", (e) => {
@@ -14,6 +14,8 @@ export function start_input_listeners() {
       Game.ins.debug_show_noise_overlay = !Game.ins.debug_show_noise_overlay;
     } else if (e.code === "KeyV") {
       Game.ins.debug_voronoi_noise_enabled = !Game.ins.debug_voronoi_noise_enabled;
+    } else if (e.code === "KeyX") {
+      Game.ins.debug_show_color_coded_edges = !Game.ins.debug_show_color_coded_edges;
     } else if (e.code === "Escape") {
       toggle_pause();
     } else if (e.code === "Digit1") {
@@ -28,6 +30,8 @@ export function start_input_listeners() {
       if (Game.ins.paused) {
         voronoiDebug?.reproject();
       }
+    } else if (e.code === "KeyG") {
+      massSpringDebug?.show();
     }
   });
 

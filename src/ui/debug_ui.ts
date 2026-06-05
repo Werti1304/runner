@@ -52,6 +52,7 @@ export class FpsDisplay {
       const seedPoints = Game.ins.debug_show_seed_points ? "ON" : "OFF";
       const noiseOverlay = Game.ins.debug_show_noise_overlay ? "ON" : "OFF";
       const noise = Game.ins.debug_voronoi_noise_enabled ? "ON" : "OFF";
+      const colorCodedEdges = Game.ins.debug_show_color_coded_edges ? "ON" : "OFF";
 
       this.label.text = [
         `FPS: ${fps.toFixed(1)} (target: ${targetRender})[1/2]`,
@@ -60,6 +61,7 @@ export class FpsDisplay {
         `Voronoi Seed Points[M]: ${seedPoints}`,
         `Noise-Overlay on[B]: ${noiseOverlay}`,
         `Noise on[V]: ${noise}`,
+        `MSS Color coded edges[X]: ${colorCodedEdges}`,
       ].join("\n");
 
       this.frameCount = 0;

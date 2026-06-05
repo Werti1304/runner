@@ -4,7 +4,7 @@ import { process_physics } from "./physics.js";
 import { Game } from "./game.js";
 import { start_input_listeners } from "./input.js";
 import { startWindowHandlers } from "./windows_events.js";
-import { FpsDisplay } from "./ui/fps_display.js";
+import { FpsDisplay } from "./ui/debug_ui.js";
 import { SegmentManager } from "./platforms/segment_manager.js";
 
 (async () => {

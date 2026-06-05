@@ -21,6 +21,7 @@ export class Game {
   debug_show_seed_points: boolean = false;
   debug_show_noise_overlay: boolean = false;
   debug_voronoi_noise_enabled: boolean = true;
+  debug_show_color_coded_edges: boolean = false;
 
   // Every tick, gets set to false
   // In the same tick, segments are set to true if they're in range

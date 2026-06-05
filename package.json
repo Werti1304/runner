@@ -10,6 +10,7 @@
     "dev": "vite"
   },
   "dependencies": {
+    "@pixi/ui": "^2.3.2",
     "pixi.js": "^8.8.1",
     "simplex-noise": "^4.0.3"
   },

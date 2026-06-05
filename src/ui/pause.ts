@@ -1,9 +1,11 @@
 import * as PIXI from "pixi.js";
 import { Game } from "../game.js";
 import { VoronoiDebug } from "../voronoi/VoronoiDebug.js";
+import { MassSpringDebug } from "../mass_spring_system/MassSpringFactory.js";
 
 let pause_container: PIXI.Container | null = null;
 export let voronoiDebug: VoronoiDebug | null = null;
+export let massSpringDebug: MassSpringDebug | null = null;
 
 export function toggle_pause(): void {
   if (Game.ins.paused) {
@@ -22,6 +24,9 @@ function pause(): void {
 
   voronoiDebug = new VoronoiDebug();
   voronoiDebug.show();
+
+  massSpringDebug = new MassSpringDebug();
+  massSpringDebug.show();
 
   // Semi-transparent rect to make the game look darker
   const overlay = new PIXI.Graphics();
@@ -76,5 +81,8 @@ function unpause(): void {
 
     voronoiDebug?.hide();
     voronoiDebug = null;
+
+    massSpringDebug?.hide();
+    massSpringDebug = null;
   }
 }
