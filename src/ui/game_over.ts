@@ -1,6 +1,7 @@
 import * as PIXI from "pixi.js";
 import { Button } from "@pixi/ui";
 import { Game } from "../game.js";
+import { SegmentManager } from "../platforms/segment_manager.js";
 
 let gameover_container: PIXI.Container | null = null;
 
@@ -23,6 +24,16 @@ export function show_gameover(): void {
   label.position.set(Game.ins.app.screen.width / 2, Game.ins.app.screen.height / 3);
   gameover_container.addChild(label);
 
+  const score = Math.floor(SegmentManager.speedMultiplier * 1000);
+
+  const scoreText = new PIXI.Text({
+    text: `Score: ${score}`,
+    style: { fontFamily: "Lucida Console", fontSize: 36, fill: 0xffffff },
+  });
+  scoreText.anchor.set(0.5);
+  scoreText.position.set(Game.ins.app.screen.width / 2, Game.ins.app.screen.height / 3 + 90);
+  gameover_container.addChild(scoreText);
+
   const buttonText = new PIXI.Text({
     text: "Restart",
     style: { fontFamily: "Lucida Console", fontSize: 32, fill: 0xaaaaaa },
@@ -32,7 +43,7 @@ export function show_gameover(): void {
   button.onPress.connect(() => window.location.reload());
 
   buttonText.anchor.set(0.5);
-  buttonText.position.set(Game.ins.app.screen.width / 2, Game.ins.app.screen.height / 3 + 90);
+  buttonText.position.set(Game.ins.app.screen.width / 2, Game.ins.app.screen.height / 3 + 150);
   gameover_container.addChild(buttonText);
 
   Game.ins.app.stage.addChild(gameover_container);
