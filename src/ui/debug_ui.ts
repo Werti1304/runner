@@ -1,5 +1,6 @@
 import { Game } from "../game.js";
 import { Text } from "pixi.js";
+import { SegmentManager } from "../platforms/segment_manager.js";
 
 export class FpsDisplay {
   private label: Text;
@@ -62,6 +63,7 @@ export class FpsDisplay {
       const colorCodedEdges = Game.ins.debug_show_color_coded_edges ? "ON" : "OFF";
 
       this.label.text = [
+        `Current Speed: ${SegmentManager.speedMultiplier.toFixed(2)}x`,
         `FPS: ${fps.toFixed(1)} (target: ${targetRender})[1/2]`,
         `Physics: ${pps.toFixed(1)} (target: ${targetPhysics})[3/4]`,
         `Distance fields to cell boundary[N]: ${distFields}`,

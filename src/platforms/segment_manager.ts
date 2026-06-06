@@ -6,14 +6,18 @@ import { SIDES } from "./segment_side.js";
 import { BreakableSegment } from "./breakable_segment.js";
 
 const SEGMENT_SPEED_MULTIPLIER = 1.0;
+const SPEED_INCREASE_PER_SECOND = 1 / 3 / 60;
 const LEVEL_DIFFICULTY = 0.5; // 0 - 1
 const BREAKY_SEGMENTS = 0.1;
 
 export class SegmentManager {
   private segments: Segment[] = [];
 
+  public static speedMultiplier = SEGMENT_SPEED_MULTIPLIER;
+  private elapsed = 0;
+
   private readonly laneOffsets = [-2, 0, 2];
-  private readonly segmentCount = 200;
+  private readonly segmentCount = 1000;
   private readonly segmentDepth = 2;
 
   private OctagonTexture: Texture;
@@ -52,6 +56,9 @@ export class SegmentManager {
   }
 
   public tick(delta: number) {
+    this.elapsed += delta;
+    SegmentManager.speedMultiplier = SEGMENT_SPEED_MULTIPLIER + this.elapsed * SPEED_INCREASE_PER_SECOND;
+
     Game.ins.segment_collisions = [null, null, null];
     this.updateViewMatrix();
 
@@ -61,10 +68,10 @@ export class SegmentManager {
       if (!seg.valid) {
         this.segments.splice(i, 1);
       } else {
-        seg.update(delta * SEGMENT_SPEED_MULTIPLIER);
+        seg.update(delta * SegmentManager.speedMultiplier);
       }
+      // const c = Game.ins.segment_collisions;
+      // console.log(`segments: [${c.map((v) => (v ? "█" : "░")).join(" ")}] [${Segment.CurrentSide}]`);
     }
-    // const c = Game.ins.segment_collisions;
-    // console.log(`segments: [${c.map((v) => (v ? "█" : "░")).join(" ")}] [${Segment.CurrentSide}]`);
   }
 }
