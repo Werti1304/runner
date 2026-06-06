@@ -55,8 +55,8 @@ function pause(): void {
     text: "Press ESC to continue c:",
     style: {
       fontFamily: "Lucida Console",
-      fontSize: 20,
-      fill: 0xcccccc,
+      fontSize: 32,
+      fill: 0xffffff,
     },
   });
 

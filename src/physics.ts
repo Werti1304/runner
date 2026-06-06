@@ -2,6 +2,7 @@ import { Game } from "./game.js";
 import { COLLISION_Z_END, COLLISION_Z_START, Segment } from "./platforms/segment.js";
 import { rotateSide, SIDES } from "./platforms/segment_side.js";
 import { Player } from "./player.js";
+import { show_gameover } from "./ui/game_over.js";
 import { ImpactParams } from "./voronoi/VoronoiFracture.js";
 
 const GRAVITY = 0.8;
@@ -129,9 +130,13 @@ function wall_collide_handler(left: boolean) {
 function isPlayerOnGround(player: Player, segment_collisions: (Segment | null)[]): boolean {
   const feetPos = player.sprite!.y + player.sprite!.height / 2;
 
-  // If in air, no collision possible
-  // If under platform for more than half its body, also no collision possible
-  if (feetPos < ground_y || feetPos > ground_y + player.sprite!.y / 2) return false;
+  // if feet pos way under the map, trigger game over
+  if (feetPos > 1.5 * screen_height) show_gameover();
+
+  if (feetPos < ground_y || feetPos > ground_y + player.sprite!.height / 2)
+    // If in air, no collision possible
+    // If under platform for more than half its body, also no collision possible
+    return false;
 
   const segment_width = (wall_x_right - wall_x_left) / 3;
   const player_left = player.sprite!.x - player.sprite!.width / 2;
