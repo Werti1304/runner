@@ -1,11 +1,11 @@
 import * as PIXI from "pixi.js";
 import { Game } from "../game.js";
 import { VoronoiDebug } from "../voronoi/VoronoiDebug.js";
-import { MassSpringDebug } from "../mass_spring_system/MassSpringFactory.js";
+import { MassSpringFactory } from "../mass_spring_system/MassSpringFactory.js";
 
 let pause_container: PIXI.Container | null = null;
 export let voronoiDebug: VoronoiDebug | null = null;
-export let massSpringDebug: MassSpringDebug | null = null;
+export let massSpringDebug: MassSpringFactory | null = null;
 
 export function toggle_pause(): void {
   if (Game.ins.paused) {
@@ -19,13 +19,14 @@ function pause(): void {
   if (Game.ins.paused) return;
 
   Game.ins.paused = true;
+  Game.ins.player.sprite!.stop();
 
   pause_container = new PIXI.Container();
 
   voronoiDebug = new VoronoiDebug();
   voronoiDebug.show();
 
-  massSpringDebug = new MassSpringDebug();
+  massSpringDebug = new MassSpringFactory();
   massSpringDebug.show();
 
   // Semi-transparent rect to make the game look darker
@@ -73,6 +74,7 @@ function unpause(): void {
   if (!Game.ins.paused) return;
 
   Game.ins.paused = false;
+  Game.ins.player.sprite!.play();
 
   if (pause_container) {
     Game.ins.app.stage.removeChild(pause_container);

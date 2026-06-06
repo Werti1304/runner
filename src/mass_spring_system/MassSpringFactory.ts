@@ -10,7 +10,7 @@ const COLOR_FREE = 0x00ff00;
 const COLOR_DRAGGING = 0x0000ff;
 const COLOR_SPRING = 0xffffff;
 
-export class MassSpringDebug {
+export class MassSpringFactory {
   private gfx!: Graphics;
   private sim!: MassSpringSystem;
   private controls!: MassSpringControls;
@@ -48,11 +48,15 @@ export class MassSpringDebug {
     this.controls.attach();
 
     this.draw();
-    Game.ins.app.ticker.add(this.tick);
+  }
+
+  public step(dt: number): void {
+    if (!this.visible) return;
+    this.sim.step(dt);
+    this.draw();
   }
 
   private removeGraphics(): void {
-    Game.ins.app.ticker.remove(this.tick);
     this.controls?.detach();
     if (this.gfx) {
       Game.ins.app.stage.removeChild(this.gfx);
@@ -115,22 +119,23 @@ export class MassSpringDebug {
         }
       }
 
-      if (!m.pinned && !isDragging) {
-        const speed = Math.hypot(m.velocity.x, m.velocity.y);
-        if (speed > 0.5) {
-          const tx = px + m.velocity.x * 4,
-            ty = py + m.velocity.y * 4;
-          g.setStrokeStyle({ color: 0xffee99, width: 1.5, alpha: 0.65 });
-          g.beginPath();
-          g.moveTo(px, py);
-          g.lineTo(tx, ty);
-          g.stroke();
-          g.setFillStyle({ color: 0xffee99, alpha: 0.65 });
-          g.beginPath();
-          g.circle(tx, ty, 2.5);
-          g.fill();
-        }
-      }
+      // Directions for debugging
+      // if (!m.pinned && !isDragging) {
+      //   const speed = Math.hypot(m.velocity.x, m.velocity.y);
+      //   if (speed > 0.5) {
+      //     const tx = px + m.velocity.x * 4,
+      //       ty = py + m.velocity.y * 4;
+      //     g.setStrokeStyle({ color: 0xffee99, width: 1.5, alpha: 0.65 });
+      //     g.beginPath();
+      //     g.moveTo(px, py);
+      //     g.lineTo(tx, ty);
+      //     g.stroke();
+      //     g.setFillStyle({ color: 0xffee99, alpha: 0.65 });
+      //     g.beginPath();
+      //     g.circle(tx, ty, 2.5);
+      //     g.fill();
+      //   }
+      // }
     }
   }
 }

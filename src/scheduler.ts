@@ -1,25 +1,29 @@
 import { Game } from "./game.js";
 
-export type ProcessFn = (delta: number) => void;
-export type PhysicsFn = (dt: number) => void;
+export type Fn = (delta: number) => void;
 export type RenderFn = (alpha: number) => void;
 
 export class Scheduler {
   private targetRenderFps: number;
   private targetPhysicsFps: number;
+  private targetMassSpringFps: number;
   private physicsDt: number;
+
+  private massSpringInterval: number | null = null;
 
   private intervalId: ReturnType<typeof setInterval> | null = null;
 
-  private processCallback: ProcessFn | null = null;
-  private physicsCallback: PhysicsFn | null = null;
+  private processCallback: Fn | null = null;
+  private physicsCallback: Fn | null = null;
+  private massSpringCallback: Fn | null = null;
   private renderCallback: RenderFn | null = null;
 
   private lastPhysicsTime: number = 0;
 
-  constructor(physicsFps: number = 60, renderFps: number = 60) {
+  constructor(physicsFps: number = 60, renderFps: number = 60, massSpringFps: number = 60) {
     this.targetPhysicsFps = physicsFps;
     this.targetRenderFps = renderFps;
+    this.targetMassSpringFps = massSpringFps;
     this.physicsDt = 1 / physicsFps;
   }
 
@@ -46,6 +50,17 @@ export class Scheduler {
     this.setRenderFps(this.targetRenderFps + delta);
   }
 
+  public adjustMassSpringFps(delta: number): void {
+    this.targetMassSpringFps = Math.max(1, this.targetMassSpringFps + delta);
+    if (this.massSpringCallback !== null) {
+      this.startMassSpring(this.massSpringCallback);
+    }
+  }
+
+  public getTargetMassSpringFps(): number {
+    return this.targetMassSpringFps;
+  }
+
   public getTargetPhysicsFps(): number {
     return this.targetPhysicsFps;
   }
@@ -54,15 +69,17 @@ export class Scheduler {
     return this.targetRenderFps;
   }
 
-  start(process: ProcessFn, process_physics: PhysicsFn, render?: RenderFn) {
+  start(process: Fn, process_physics: Fn, process_mass_spring: Fn, render?: RenderFn) {
     if (this.intervalId !== null) return;
 
     this.processCallback = process;
     this.physicsCallback = process_physics;
+    this.massSpringCallback = process_mass_spring;
     this.renderCallback = render ?? null;
 
     this.startRenderLoop();
     this.startPhysicsLoop();
+    this.startMassSpring(process_mass_spring);
   }
 
   private startRenderLoop() {
@@ -91,6 +108,18 @@ export class Scheduler {
       this.physicsCallback?.(this.physicsDt);
       this.lastPhysicsTime = performance.now();
     }, intervalMs);
+  }
+
+  private startMassSpring(fn: (dt: number) => void): void {
+    if (this.massSpringInterval !== null) clearInterval(this.massSpringInterval);
+    const interval = 1000 / this.targetMassSpringFps;
+    let last = performance.now();
+    this.massSpringInterval = setInterval(() => {
+      const now = performance.now();
+      if (!Game.ins.paused) return; // if game isn't paused, dont simulate mass spring system
+      fn((now - last) / 1000);
+      last = now;
+    }, interval);
   }
 
   private resetPhysicsLoop() {

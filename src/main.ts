@@ -6,6 +6,7 @@ import { start_input_listeners } from "./input.js";
 import { startWindowHandlers } from "./windows_events.js";
 import { FpsDisplay } from "./ui/debug_ui.js";
 import { SegmentManager } from "./platforms/segment_manager.js";
+import { massSpringDebug } from "./ui/pause.js";
 
 (async () => {
   const game = Game.ins;
@@ -37,6 +38,10 @@ import { SegmentManager } from "./platforms/segment_manager.js";
       process_physics(dt);
       fpsDisplay.updatePhysics();
       segment_manager.tick(dt);
+    },
+    (dt) => {
+      massSpringDebug?.step(dt);
+      fpsDisplay.updateMassSpring();
     },
   );
 

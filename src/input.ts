@@ -26,6 +26,10 @@ export function start_input_listeners() {
       Game.ins.scheduler.adjustPhysicsFps(-5);
     } else if (e.code === "Digit4") {
       Game.ins.scheduler.adjustPhysicsFps(+5);
+    } else if (e.code === "Digit5") {
+      Game.ins.scheduler.adjustMassSpringFps(-5);
+    } else if (e.code === "Digit6") {
+      Game.ins.scheduler.adjustMassSpringFps(+5);
     } else if (e.code === "KeyF") {
       if (Game.ins.paused) {
         voronoiDebug?.reproject();

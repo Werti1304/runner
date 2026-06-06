@@ -6,6 +6,7 @@ export class FpsDisplay {
 
   private frameCount = 0;
   private physicsCount = 0;
+  private massSpringCount = 0;
 
   private lastTime = performance.now();
 
@@ -37,6 +38,10 @@ export class FpsDisplay {
     this.physicsCount++;
   }
 
+  public updateMassSpring() {
+    this.massSpringCount++;
+  }
+
   public tick() {
     const now = performance.now();
     const elapsed = (now - this.lastTime) / 1000;
@@ -44,9 +49,11 @@ export class FpsDisplay {
     if (elapsed >= 1.0) {
       const fps = this.frameCount / elapsed;
       const pps = this.physicsCount / elapsed;
+      const mss = this.massSpringCount / elapsed;
 
       const targetRender = Game.ins.scheduler.getTargetRenderFps();
       const targetPhysics = Game.ins.scheduler.getTargetPhysicsFps();
+      const targetMassSpring = Game.ins.scheduler.getTargetMassSpringFps();
 
       const distFields = Game.ins.debug_show_distance_fields ? "ON" : "OFF";
       const seedPoints = Game.ins.debug_show_seed_points ? "ON" : "OFF";
@@ -61,11 +68,13 @@ export class FpsDisplay {
         `Voronoi Seed Points[M]: ${seedPoints}`,
         `Noise-Overlay on[B]: ${noiseOverlay}`,
         `Noise on[V]: ${noise}`,
+        `MSS Update Rate: ${mss.toFixed(1)} (target: ${targetMassSpring})[5/6]`,
         `MSS Color coded edges[X]: ${colorCodedEdges}`,
       ].join("\n");
 
       this.frameCount = 0;
       this.physicsCount = 0;
+      this.massSpringCount = 0;
       this.lastTime = now;
     }
   }

@@ -1,6 +1,3 @@
-// TODO: Adjustable controls for Animation update rate / step size h
-// Move the steps into physics_process
-
 import { Button, Slider } from "@pixi/ui";
 import { Container, Graphics, Text, TextStyle, Ticker } from "pixi.js";
 import { Game } from "../game.js";
