@@ -1,4 +1,4 @@
-import { Graphics, Ticker } from "pixi.js";
+import { Graphics } from "pixi.js";
 import { Game } from "../game.js";
 import { MassSpringSystem } from "./MassSpringSystem.js";
 import { MassSpringControls } from "./MassSpringControls.js";
@@ -15,11 +15,6 @@ export class MassSpringFactory {
   private sim!: MassSpringSystem;
   private controls!: MassSpringControls;
   private visible = false;
-
-  private readonly tick = (ticker: Ticker): void => {
-    this.sim.step(ticker.deltaMS / 1000);
-    this.draw();
-  };
 
   public show(): void {
     this.visible = true;

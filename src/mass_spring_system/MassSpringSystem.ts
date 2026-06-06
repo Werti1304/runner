@@ -21,6 +21,8 @@ export interface Spring {
 }
 
 export class MassSpringSystem {
+  private readonly gravity: number = 980;
+
   masses: Mass[] = [];
   springs: Spring[] = [];
 
@@ -114,6 +116,16 @@ export class MassSpringSystem {
         } else {
           mB.accelerationNext = add(mB.accelerationNext, bContrib);
         }
+      }
+    }
+
+    // Gravity
+    for (const m of this.masses) {
+      if (m.pinned) continue;
+      if (target === "current") {
+        m.acceleration.y += this.gravity / m.mass;
+      } else {
+        m.accelerationNext.y += this.gravity / m.mass;
       }
     }
   }

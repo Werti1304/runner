@@ -1,5 +1,5 @@
 import { Game } from "./game.js";
-import { massSpringDebug, toggle_pause, voronoiDebug } from "./ui/pause.js";
+import { massSpringFactory, toggle_pause, voronoiDebug } from "./ui/pause.js";
 
 export function start_input_listeners() {
   window.addEventListener("keydown", (e) => {
@@ -35,7 +35,7 @@ export function start_input_listeners() {
         voronoiDebug?.reproject();
       }
     } else if (e.code === "KeyG") {
-      massSpringDebug?.show();
+      massSpringFactory?.show();
     }
   });
 
