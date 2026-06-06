@@ -6,8 +6,8 @@ import { SIDES } from "./segment_side.js";
 import { BreakableSegment } from "./breakable_segment.js";
 
 const SEGMENT_SPEED_MULTIPLIER = 1.0;
-const SPEED_INCREASE_PER_SECOND = 1 / 3 / 60;
-const LEVEL_DIFFICULTY = 0.5; // 0 - 1
+const SPEED_INCREASE_PER_SECOND = 1 / 2 / 60;
+const LEVEL_DIFFICULTY = 0.6; // 0 - 1
 const BREAKY_SEGMENTS = 0.1;
 
 export class SegmentManager {

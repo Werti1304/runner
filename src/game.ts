@@ -5,6 +5,7 @@ import { SegmentCamera } from "./platforms/segment_camera.js";
 import { ground_y, screen_height, wall_x_left, wall_x_right } from "./physics.js";
 import { Segment } from "./platforms/segment.js";
 import { Scheduler } from "./scheduler.js";
+import { FpsDisplay } from "./ui/debug_ui.js";
 
 export class Game {
   static #instance: Game;
@@ -14,6 +15,7 @@ export class Game {
   collision_visualization: Graphics = new Graphics();
   segment_camera: SegmentCamera = new SegmentCamera();
   scheduler!: Scheduler;
+  fps_display!: FpsDisplay;
 
   pressed_keys: Record<string, boolean> = {};
 

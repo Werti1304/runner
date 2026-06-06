@@ -105,16 +105,16 @@ export function process_physics(delta: number) {
 function wall_collide_handler(left: boolean) {
   const player = Game.ins.player;
 
-  const normalizedY = player.sprite!.y / screen_height;
+  // Normalize Y within the playable column (wall_x_left to wall_x_right maps to the same range as ground_y)
+  const playableSize = screen_height * 0.6; // wall_x_right - wall_x_left = screen_height * 0.6
+  const normalizedY = Math.max(0, Math.min((ground_y - player.sprite!.y) / playableSize, 1));
 
   if (left) {
-    // Left wall becomes ground: player slides right-to-left
-    player.sprite!.x = normalizedY * screen_height + offset_x;
+    player.sprite!.x = wall_x_right - normalizedY * playableSize;
     Game.ins.segment_camera.target_roll -= Math.PI / 2;
     Segment.CurrentSide = rotateSide(Segment.CurrentSide, true);
   } else {
-    // Right wall becomes ground: player slides left-to-right (mirrored)
-    player.sprite!.x = (1 - normalizedY) * screen_height + offset_x;
+    player.sprite!.x = wall_x_left + normalizedY * playableSize;
     Game.ins.segment_camera.target_roll += Math.PI / 2;
     Segment.CurrentSide = rotateSide(Segment.CurrentSide, false);
   }
@@ -122,10 +122,36 @@ function wall_collide_handler(left: boolean) {
   // Clamp inside walls so we don't immediately re-trigger
   player.sprite!.x = Math.max(wall_x_left, Math.min(wall_x_right, player.sprite!.x));
 
-  player.sprite!.y = 1.01 * ground_y;
+  // Snap to new ground
+  player.sprite!.y = ground_y - player.sprite!.height / 2;
   player.velocity_y = 0;
   player.is_grounded = true;
 }
+
+// function wall_collide_handler(left: boolean) {
+//   const player = Game.ins.player;
+
+//   const normalizedY = player.sprite!.y / screen_height;
+
+//   if (left) {
+//     // Left wall becomes ground: player slides right-to-left
+//     player.sprite!.x = normalizedY * screen_height + offset_x;
+//     Game.ins.segment_camera.target_roll -= Math.PI / 2;
+//     Segment.CurrentSide = rotateSide(Segment.CurrentSide, true);
+//   } else {
+//     // Right wall becomes ground: player slides left-to-right (mirrored)
+//     player.sprite!.x = (1 - normalizedY) * screen_height + offset_x;
+//     Game.ins.segment_camera.target_roll += Math.PI / 2;
+//     Segment.CurrentSide = rotateSide(Segment.CurrentSide, false);
+//   }
+
+//   // Clamp inside walls so we don't immediately re-trigger
+//   player.sprite!.x = Math.max(wall_x_left, Math.min(wall_x_right, player.sprite!.x));
+
+//   player.sprite!.y = 1.01 * ground_y;
+//   player.velocity_y = 0;
+//   player.is_grounded = true;
+// }
 
 function isPlayerOnGround(player: Player, segment_collisions: (Segment | null)[]): boolean {
   const feetPos = player.sprite!.y + player.sprite!.height / 2;

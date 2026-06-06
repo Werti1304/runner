@@ -26,6 +26,7 @@ import { massSpringFactory } from "./ui/pause.js";
 
   // expose on Game so input.ts and fps_display.ts can reach it
   Game.ins.scheduler = scheduler;
+  Game.ins.fps_display = fpsDisplay;
 
   setInterval(() => fpsDisplay.tick(), 1000);
 
