@@ -44,11 +44,11 @@ export function process_physics(delta: number) {
   game.drawCollisionVisualization();
 
   if (game.pressed_keys["KeyA"]) {
-    player.sprite.x -= MOVE_SPEED * screen_height * delta;
+    player.sprite!.x -= MOVE_SPEED * screen_height * delta;
   }
 
   if (game.pressed_keys["KeyD"]) {
-    player.sprite.x += MOVE_SPEED * screen_height * delta;
+    player.sprite!.x += MOVE_SPEED * screen_height * delta;
   }
 
   if (player.is_grounded) {
@@ -82,19 +82,19 @@ export function process_physics(delta: number) {
   player.velocity_y += GRAVITY * screen_height * delta;
 
   // actual movement
-  player.sprite.y += player.velocity_y * delta;
+  player.sprite!.y += player.velocity_y * delta;
 
   // Check ground collision
   if (isPlayerOnGround(player, game.segment_collisions)) {
-    player.sprite.y = ground_y - player.sprite.height / 2;
+    player.sprite!.y = ground_y - player.sprite!.height / 2;
     player.velocity_y = 0;
     player.is_grounded = true;
   }
 
   // Check wall collision (we ignore whether or not there's a segment there)
-  if (player.sprite.x < wall_x_left) {
+  if (player.sprite!.x < wall_x_left) {
     wall_collide_handler(true);
-  } else if (player.sprite.x > wall_x_right) {
+  } else if (player.sprite!.x > wall_x_right) {
     wall_collide_handler(false);
   }
 }
@@ -102,38 +102,38 @@ export function process_physics(delta: number) {
 function wall_collide_handler(left: boolean) {
   const player = Game.ins.player;
 
-  const normalizedY = player.sprite.y / screen_height;
+  const normalizedY = player.sprite!.y / screen_height;
 
   if (left) {
     // Left wall becomes ground: player slides right-to-left
-    player.sprite.x = normalizedY * screen_height + offset_x;
+    player.sprite!.x = normalizedY * screen_height + offset_x;
     Game.ins.segment_camera.target_roll -= Math.PI / 2;
     Segment.CurrentSide = rotateSide(Segment.CurrentSide, true);
   } else {
     // Right wall becomes ground: player slides left-to-right (mirrored)
-    player.sprite.x = (1 - normalizedY) * screen_height + offset_x;
+    player.sprite!.x = (1 - normalizedY) * screen_height + offset_x;
     Game.ins.segment_camera.target_roll += Math.PI / 2;
     Segment.CurrentSide = rotateSide(Segment.CurrentSide, false);
   }
 
   // Clamp inside walls so we don't immediately re-trigger
-  player.sprite.x = Math.max(wall_x_left, Math.min(wall_x_right, player.sprite.x));
+  player.sprite!.x = Math.max(wall_x_left, Math.min(wall_x_right, player.sprite!.x));
 
-  player.sprite.y = 1.01 * ground_y;
+  player.sprite!.y = 1.01 * ground_y;
   player.velocity_y = 0;
   player.is_grounded = true;
 }
 
 function isPlayerOnGround(player: Player, segment_collisions: (Segment | null)[]): boolean {
-  const feetPos = player.sprite.y + player.sprite.height / 2;
+  const feetPos = player.sprite!.y + player.sprite!.height / 2;
 
   // If in air, no collision possible
   // If under platform for more than half its body, also no collision possible
-  if (feetPos < ground_y || feetPos > ground_y + player.sprite.y / 2) return false;
+  if (feetPos < ground_y || feetPos > ground_y + player.sprite!.y / 2) return false;
 
   const segment_width = (wall_x_right - wall_x_left) / 3;
-  const player_left = player.sprite.x - player.sprite.width / 2;
-  const player_right = player.sprite.x + player.sprite.width / 2;
+  const player_left = player.sprite!.x - player.sprite!.width / 2;
+  const player_right = player.sprite!.x + player.sprite!.width / 2;
 
   let on_ground: boolean = false;
 
@@ -151,8 +151,8 @@ function isPlayerOnGround(player: Player, segment_collisions: (Segment | null)[]
       const isFlipped = segment_collisions[s]!.side == SIDES[0] || segment_collisions[s]!.side == SIDES[3];
       // TODO: This didn't work, fix impact point on segment if have time
       const impact_x = isFlipped
-        ? 1 - (((player.sprite.x - seg_start) / segment_width) * 0.8 + 0.1)
-        : ((player.sprite.x - seg_start) / segment_width) * 0.8 + 0.1;
+        ? 1 - (((player.sprite!.x - seg_start) / segment_width) * 0.8 + 0.1)
+        : ((player.sprite!.x - seg_start) / segment_width) * 0.8 + 0.1;
       // Stupid formula to go from current z to a value between 0.1 and 0.9
       const impact_y =
         ((segment_collisions[s]!.z - COLLISION_Z_START) / (COLLISION_Z_END - COLLISION_Z_START)) * 0.8 + 0.1;

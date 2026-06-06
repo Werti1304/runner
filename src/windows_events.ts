@@ -9,7 +9,8 @@ export function startWindowHandlers() {
 
 export function onWindowResize() {
   const game = Game.ins;
-  game.player.sprite.position.set(game.app.screen.width / 2, game.app.screen.height / 2);
+  console.log(game.player.sprite);
+  game.player.sprite!.position.set(game.app.screen.width / 2, game.app.screen.height / 2);
   recalculateProjectionMatrix();
   game.drawCollisionVisualization();
   game.player.drawPlayerSprite();
