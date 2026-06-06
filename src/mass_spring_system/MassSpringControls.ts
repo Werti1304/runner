@@ -1,5 +1,5 @@
 import { Button, Slider } from "@pixi/ui";
-import { Container, Graphics, Text, TextStyle, Ticker } from "pixi.js";
+import { Container, FederatedPointerEvent, Graphics, Text, TextStyle } from "pixi.js";
 import { Game } from "../game.js";
 import { MassSpringSystem } from "./MassSpringSystem.js";
 
@@ -83,7 +83,7 @@ export class MassSpringControls {
     this.destroyPanel();
   }
 
-  private readonly onTick = (_t: Ticker): void => {
+  private readonly onTick = (): void => {
     const s = Game.ins.app.screen;
     this.panel.x = s.width - PANEL_W - PANEL_PAD;
     this.panel.y = 200 + PANEL_PAD;
@@ -107,8 +107,8 @@ export class MassSpringControls {
     e.preventDefault();
   };
 
-  private readonly onPointerDown = (e: any): void => {
-    const { x, y } = e.global as { x: number; y: number };
+  private readonly onPointerDown = (e: FederatedPointerEvent): void => {
+    const { x, y } = e.global;
     if (this.inPanel(x, y)) return;
     const btn = e.button as number;
     if (this._createMode) {
@@ -131,13 +131,13 @@ export class MassSpringControls {
     }
   };
 
-  private readonly onPointerMove = (e: any): void => {
-    const { x, y } = e.global as { x: number; y: number };
+  private readonly onPointerMove = (e: FederatedPointerEvent): void => {
+    const { x, y } = e.global;
     this.cursorPos.x = x;
     this.cursorPos.y = y;
   };
 
-  private readonly onPointerUp = (_e: any): void => {
+  private readonly onPointerUp = (): void => {
     if (!this.drag) return;
     this.sim.masses[this.drag.massIndex].pinned = this.drag.wasOriginallyPinned;
     this.drag = null;

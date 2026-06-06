@@ -79,7 +79,7 @@ export class BreakableSegment extends Segment {
     this.snapFaceRotY = this.faceRotationY;
 
     const voronoi = new Voronoi();
-    const { texture, cells } = voronoi.drawForMesh(30, params);
+    const { texture, cells } = voronoi.drawForMesh(20, params);
 
     this.voronoiTexture = texture;
 
