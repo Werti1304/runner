@@ -464,10 +464,8 @@ export class Voronoi {
       const px = Math.round(site.x);
       const py = Math.round(site.y);
       const inBounds = px >= 0 && px < width && py >= 0 && py < height;
-      if (inBounds && maskGrid[py * width + px])
-        src[py * width + px] = { siteId: site.id, seedX: site.x, seedY: site.y };
+      if (inBounds) src[py * width + px] = { siteId: site.id, seedX: site.x, seedY: site.y };
     }
-
     // Start: For each step size k (N/2, N/4, ..., 1), run one iteration of the JFA:
     const maxDim = Math.max(width, height);
     // I hate javascript what is this
