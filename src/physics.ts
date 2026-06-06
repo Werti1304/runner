@@ -97,6 +97,8 @@ export function process_physics(delta: number) {
   } else if (player.sprite!.x > wall_x_right) {
     wall_collide_handler(false);
   }
+
+  player.drawShadow();
 }
 
 function wall_collide_handler(left: boolean) {

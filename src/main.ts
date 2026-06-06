@@ -12,9 +12,9 @@ import { SegmentManager } from "./platforms/segment_manager.js";
   await game.init();
 
   // Player
-  game.player.sprite.anchor.set(0.5);
-  game.player.sprite.zIndex = 2;
-  game.app.stage.addChild(game.player.sprite);
+  game.player.sprite!.anchor.set(0.5);
+  game.player.sprite!.zIndex = 4;
+  game.app.stage.addChild(game.player.sprite!);
 
   // Prototype platform
   game.collision_visualization.zIndex = 5;

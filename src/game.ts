@@ -76,10 +76,10 @@ export class Game {
 
     // Draw player collision box
     const player = Game.ins.player;
-    const px = player.sprite.x - player.sprite.width / 2;
-    const py = player.sprite.y - player.sprite.height / 2;
+    const px = player.sprite!.x - player.sprite!.width / 2;
+    const py = player.sprite!.y - player.sprite!.height / 2;
 
-    g.rect(px, py, player.sprite.width, player.sprite.height).stroke({ color: 0xffff00, width: 2 });
+    g.rect(px, py, player.sprite!.width, player.sprite!.height).stroke({ color: 0xffff00, width: 2 });
 
     // Draw wall bounds
     g.rect(wall_x_left - 2, 0, 4, screen_height).fill(0xff8800);
