@@ -133,10 +133,20 @@ function isPlayerOnGround(player: Player, segment_collisions: (Segment | null)[]
   // if feet pos way under the map, trigger game over
   if (feetPos > 1.5 * screen_height) show_gameover();
 
-  if (feetPos < ground_y || feetPos > ground_y + player.sprite!.height / 2)
+  if (feetPos < ground_y)
     // If in air, no collision possible
-    // If under platform for more than half its body, also no collision possible
     return false;
+
+  if (feetPos > ground_y + player.sprite!.height / 2) {
+    // If under platform for more than half its body, also no collision possible
+    player.sprite!.zIndex = -1;
+    player.shadow!.visible = false;
+
+    return false;
+  } else {
+    player.sprite!.zIndex = 3;
+    player.shadow!.visible = true;
+  }
 
   const segment_width = (wall_x_right - wall_x_left) / 3;
   const player_left = player.sprite!.x - player.sprite!.width / 2;
